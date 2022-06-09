@@ -1,8 +1,5 @@
 === WordPress Quick Menu ===
 
-**Note**: this is a fork of the original plugin.  The source code for this plugin lives at 
-https://github.com/proudcity/wp-quick-menu.
-
 Contributors: proudcity, curtismchale
 Tags: Menu, Page, Post, Admin, Quick Menu
 Requires at least: 6.0.0
@@ -11,15 +8,15 @@ Stable tag: 1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-WordPress Quick Menu plugin allow you to add or remove page / post to multiple or single menu on page create or edit screen. 
+WordPress Quick Menu plugin allow you to add or remove page / post to multiple or single menu on page create or edit screen.
 
 == Description ==
 - Easily add Page/Post to  menu On edit or create.
 - Also possible to remove page from menu items during content edit screen.
-- Add page/post to multiple menu items together. 
+- Add page/post to multiple menu items together.
 - You can easily set the Menu positions including parent child relations.
-- There is automatic calculation for menu position, so don't afraid to provide a wrong position. 
-- On deactivate of this plugin will not affect already added items to menu. 
+- There is automatic calculation for menu position, so don't afraid to provide a wrong position.
+- On deactivate of this plugin will not affect already added items to menu.
 - Easy to use user interface.
 
 == Installation ==
@@ -29,8 +26,8 @@ WordPress Quick Menu plugin allow you to add or remove page / post to multiple o
 
 
 == Screenshots ==
-1. Select Menu  
-2. Add post/page to Menu 
+1. Select Menu
+2. Add post/page to Menu
 3. Menu item properties
 4. Advance settings
 5. Remove post/page from menu
@@ -41,6 +38,7 @@ WordPress Quick Menu plugin allow you to add or remove page / post to multiple o
 = 1.2 =
 
 - resolve a issues with variables that were named improperly
+- forked original plugin to resolve errors: https://wordpress.org/plugins/wp-quick-menu/
 
 = 1.0 =
 
