@@ -1,0 +1,72 @@
+#wp_quick_menu_meta_box div.wp-quick-menu-details-hide{
+    display: none;
+}
+
+.no-js #wp_quick_menu_meta_box div.wp-quick-menu-details-hide{
+    display: block;
+}
+
+#wp_quick_menu_meta_box .advance-settings{
+    display: none;
+}
+
+.no-js #wp_quick_menu_meta_box .advance-settings{
+    display: block;
+}
+
+#wp_quick_menu_meta_box .inside .accordion-container .accordion-section.open h3{
+    background: none repeat scroll 0 0 #f5f5f5;
+}
+
+#wp_quick_menu_meta_box .inside{
+    padding: 0;
+    margin: 0;
+}
+
+
+#wp_quick_menu_meta_box .inside .accordion-section-title{
+    border-left: none;
+    border-right: none;
+}
+
+#wp_quick_menu_meta_box .wp_quick_nav_menu_checked{
+    display: none;
+}
+
+#wp_quick_menu_meta_box .redcolor{
+    color: red;
+}
+
+#wp_quick_menu_meta_box .accordion-section-content{
+    padding: 5px 10px 15px 10px;
+}
+
+#wp_quick_menu_meta_box  .wp_quick_menu_advance_settings span{
+    background-image: url("img/settings.png");
+    background-repeat: no-repeat;
+    float: left;
+    height: 15px;
+    margin-top: 3px;
+    padding-right: 4px;
+    width: 16px;
+}
+
+
+#wp_quick_menu_meta_box  .wp_quick_menu_advance_settings {
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+#wp_quick_menu_meta_box .accordion-section-content p{
+    margin-bottom: 2px;
+}
+
+.wp-quick-menu-strong{
+    font-weight: bold;
+}
+
+.wp-quick-menu-name-title{
+    font-style: italic;
+    font-weight: normal;
+}
