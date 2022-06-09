@@ -10,8 +10,7 @@
   License: GPLv2 or later
  */
 
-/*  Copyright 2014 Mahabub (email: mahabub at solvease dot com)
-
+/*
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; either version 2 of the License, or
@@ -30,6 +29,7 @@
 if (!defined('WPINC')) {
     die;
 }
+
 require_once ABSPATH . 'wp-admin/includes/nav-menu.php';
 
 if (!class_exists('WP_Quick_Menu')) {
@@ -78,14 +78,17 @@ if (!class_exists('WP_Quick_Menu')) {
          * @param type $post
          */
         function wp_quick_menu_meta_box_call_back($post) {
+
             wp_nonce_field('wp_quick_menu_meta_box', 'wp_quick_menu_meta_box_nonce');
+
             $nav_menus = wp_get_nav_menus(array('orderby' => 'name'));
 
             if (!empty($nav_menus)) {
                 foreach ($nav_menus as $key => $value) {
-                    $nav_menus[$key]->menu_items = $this->wp_quick_menu_check_menu_entry($value->term_id, $post->ID);
+                    $nav_menus[$key]->menu_items = $this->wp_quick_menu_check_menu_entry( absint( $value->term_id ), absint( $post->ID ) );
                 }
-            }
+            } // if ! empty $nav_menus
+
             $locations = get_registered_nav_menus();
             $menu_locations = get_nav_menu_locations();
 
