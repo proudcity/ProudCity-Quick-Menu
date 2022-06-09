@@ -468,7 +468,7 @@ if (!class_exists('WP_Quick_Menu')) {
             foreach ($menu_ids as $menuid) {
 
                 $menu_item_data[$menuid]['menu-item-description'] = (isset($_POST['wp_quick_menu_item_desc'][ absint($menuid) ]) && trim($_POST['wp_quick_menu_item_desc'][ absint( $menuid ) ]) != '') ? trim(esc_html($_POST['wp_quick_menu_item_desc'][ absint( $menuid ) ])) : $_menu_item->description;
-                $menu_item_data[$menuid]['menu-item-title'] = (isset($_POST['wp_quick_menu_item_title'][ absint( $menuid ) ]) && trim($_POST['wp_quick_menu_item_title'][ absint( $menuid ) ]) != '') ? trim(esc_html($_POST['wp_quick_menu_item_title'][ absint( $menuid] ) )) : $_menu_item->title;
+                $menu_item_data[$menuid]['menu-item-title'] = (isset($_POST['wp_quick_menu_item_title'][ absint( $menuid ) ]) && trim($_POST['wp_quick_menu_item_title'][ absint( $menuid ) ]) != '') ? trim(esc_html($_POST['wp_quick_menu_item_title'][ absint( $menuid ) ] )) : $_menu_item->title;
                 $menu_item_data[$menuid]['menu-item-url'] = esc_url( $_menu_item->url );
                 $menu_item_data[$menuid]['menu-item-object-id'] = $_POST['wp_quick_menu_item_object_id'][ absint( $menuid ) ];
                 $menu_item_data[$menuid]['menu-item-db-id'] = (int) $_POST['wp_quick_menu_item_db_id'][ absint( $menuid ) ];
