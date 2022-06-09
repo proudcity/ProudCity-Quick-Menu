@@ -31,6 +31,7 @@ if (!defined('WPINC')) {
     die;
 }
 require_once ABSPATH . 'wp-admin/includes/nav-menu.php';
+
 if (!class_exists('WP_Quick_Menu')) {
 
     class WP_Quick_Menu {
@@ -61,7 +62,9 @@ if (!class_exists('WP_Quick_Menu')) {
          */
         function wp_quick_menu_add_meta_box() {
 
-            $in_which_screens = array('post', 'page');
+			// @TODO add filterable array here so that the post_types supported can be expanded easily
+			$in_which_screens = array('post', 'page');
+
             foreach ($in_which_screens as $screen) {
 
                 add_meta_box(
@@ -105,17 +108,22 @@ if (!class_exists('WP_Quick_Menu')) {
          */
         private function wp_quick_menu_get_possible_order_for_all_parent() {
             $possible_values = array();
+
             $nav_menus = wp_get_nav_menus(array('orderby' => 'name'));
+
             foreach ($nav_menus as $nav_menu) {
-                $possible_values[$nav_menu->term_id] = array();
-                $menu_items = $this->wp_quick_menu_nav_menu_items($nav_menu->term_id);
+
+                $possible_values[ absint( $nav_menu->term_id ) ] = array();
+                $menu_items = $this->wp_quick_menu_nav_menu_items( absint( $nav_menu->term_id ) );
                 $possible_values[$nav_menu->term_id][0] = $this->wp_quick_menu_get_possible_menu_order_for_default_parent($menu_items);
+
                 if (!empty($menu_items)) {
                     foreach ($menu_items as $menu_item) {
-                        $possible_values[$nav_menu->term_id][$menu_item->ID] = $this->wp_quick_menu_get_possible_menu_order_for_specific_parent($menu_items, $menu_item->ID, $menu_item->menu_order);
+                        $possible_values[ absint( $nav_menu->term_id ) ][ absint( $menu_item->ID ) ] = $this->wp_quick_menu_get_possible_menu_order_for_specific_parent($menu_items, $menu_item->ID, $menu_item->menu_order);
                     }
                 }
-            }
+            } // foreach
+
             return $possible_values;
         }
 
@@ -173,12 +181,12 @@ if (!class_exists('WP_Quick_Menu')) {
             // Check the user's permissions.
             if (isset($_POST['post_type']) && 'page' == $_POST['post_type']) {
 
-                if (!current_user_can('edit_page', $post_id)) {
+                if (!current_user_can('edit_page', absint( $post_id ) )) {
                     return;
                 }
             } else {
 
-                if (!current_user_can('edit_post', $post_id)) {
+                if (!current_user_can('edit_post', absint( $post_id ) )) {
                     return;
                 }
             }
@@ -239,8 +247,8 @@ if (!class_exists('WP_Quick_Menu')) {
          * @param int $postid
          * @return boolean
          */
-        private function wp_quick_menu_remove_menu_entry($postid) {
-            return wp_delete_post($postid);
+        private function wp_quick_menu_remove_menu_entry($post_id) {
+            return wp_delete_post( absint( $post_id ) );
         }
 
         /**
@@ -250,7 +258,8 @@ if (!class_exists('WP_Quick_Menu')) {
          * @return int
          */
         private function wp_quick_menu_update_menu_item_postion($menuID, $values) {
-            $nav_menu_items = $this->wp_quick_menu_nav_menu_items($menuID);
+
+            $nav_menu_items = $this->wp_quick_menu_nav_menu_items( absint( $menuID ) );
             $exisint_menu_prop = $this->wp_quick_menu_get_specific_menu_entry($nav_menu_items, $values['menu-item-db-id']);
 
             // well no change in menu Item Position
@@ -263,16 +272,20 @@ if (!class_exists('WP_Quick_Menu')) {
             $calculated_position = $this->wp_quick_menu_calculate_accurate_menu_position($nav_menu_items_logical, $values);
             $my_post = array('ID' => $exisint_menu_prop->ID, 'menu_order' => $calculated_position);
             wp_update_post($my_post);
+
             return $calculated_position;
+
         }
 
         /**
          * calculate accurate menu position
+		 *
          * @param int $menuID
          * @param array $values
          * @return boolean
          */
         private function wp_quick_menu_calculate_accurate_menu_position($nav_menu_items, $values) {
+
             // no parent selected and menu will be in last position
             if ($values['menu-item-parent-id'] <= 0 && $values['menu-item-position'] >= count($nav_menu_items) + 1) {
                 return count($nav_menu_items) + 1;
@@ -292,7 +305,7 @@ if (!class_exists('WP_Quick_Menu')) {
                 }
             }
 
-            return true;
+            return (bool) true;
         }
 
         /**
@@ -321,16 +334,24 @@ if (!class_exists('WP_Quick_Menu')) {
          * @param type $nav_menu_items
          */
         private function wp_quick_menu_update_existing_menu_order($where_nod_to_update, $nav_menu_items) {
+
             if (!empty($nav_menu_items)) {
+
                 foreach ($nav_menu_items as $nav_menu_item) {
+
                     if ($nav_menu_item->menu_order >= $where_nod_to_update) {
+
                         $my_post = array();
-                        $my_post = array('ID' => $nav_menu_item->ID, 'menu_order' => $nav_menu_item->menu_order + 1);
+                        $my_post = array('ID' => absint( $nav_menu_item->ID ) , 'menu_order' => $nav_menu_item->menu_order + 1);
                         wp_update_post($my_post);
-                    }
-                }
-            }
-            return true;
+
+					} // if $nave_menu_item->menu_order
+
+                } // foreach
+
+            } // if
+
+            return (bool) true;
         }
 
         /**
@@ -341,13 +362,15 @@ if (!class_exists('WP_Quick_Menu')) {
          * @return int
          */
         private function wp_quick_menu_get_parent_position_with_child_count($nav_menu_items, $parent_id, $current_position) {
+
             if (!empty($nav_menu_items)) {
 
                 $child = 0;
                 $parent_found = false;
+
                 foreach ($nav_menu_items as $pos => $nav_menu_item) {
                     // get parent current position
-                    if ($nav_menu_item->ID == $parent_id) {
+                    if ( absint( $nav_menu_item->ID ) === absint( $parent_id ) ) {
                         $parent_found = true;
                         $min_position = $max_position = $nav_menu_item->menu_order + 1;
                     }
@@ -356,7 +379,6 @@ if (!class_exists('WP_Quick_Menu')) {
                         $max_position += 1;
                     }
                 }
-
 
                 // if parent has no childs so position will be just after the parent
                 if ($min_position === $max_position) {
@@ -385,7 +407,9 @@ if (!class_exists('WP_Quick_Menu')) {
          * @return array
          */
         private function wp_quick_menu_get_menu_id() {
+
             $menu_ids = array();
+
             if (isset($_POST['wp_quick_nav_menu'])) {
                 $menus =  $_POST['wp_quick_nav_menu'];
                 if (is_array($menus)) {
@@ -403,6 +427,7 @@ if (!class_exists('WP_Quick_Menu')) {
             }
 
             unset($_POST['wp_quick_nav_menu']);
+
             return $menu_ids;
         }
 
@@ -431,12 +456,15 @@ if (!class_exists('WP_Quick_Menu')) {
          * @return array
          */
         private function wp_quick_menu_get_menu_data_from_post_vars($post_ID, $menu_ids) {
+
             $menu_item_data = array();
-            $_object = get_post($post_ID);
+            $_object = get_post( absint( $post_ID ) );
             $_menu_items = array_map('wp_setup_nav_menu_item', array($_object));
             $_menu_item = array_shift($_menu_items);
+
             foreach ($menu_ids as $menuid) {
-                $menu_item_data[$menuid]['menu-item-description'] = (isset($_POST['wp_quick_menu_item_desc'][$menuid]) && trim($_POST['wp_quick_menu_item_desc'][$menuid]) != '') ? trim(esc_html($_POST['wp_quick_menu_item_desc'][$menuid])) : $_menu_item->description;
+
+                $menu_item_data[$menuid]['menu-item-description'] = (isset($_POST['wp_quick_menu_item_desc'][ absint($menuid) ]) && trim($_POST['wp_quick_menu_item_desc'][ absint( $menuid ) ]) != '') ? trim(esc_html($_POST['wp_quick_menu_item_desc'][ absint( $menuid ) ])) : $_menu_item->description;
                 $menu_item_data[$menuid]['menu-item-title'] = (isset($_POST['wp_quick_menu_item_title'][$menuid]) && trim($_POST['wp_quick_menu_item_title'][$menuid]) != '') ? trim(esc_html($_POST['wp_quick_menu_item_title'][$menuid])) : $_menu_item->title;
                 $menu_item_data[$menuid]['menu-item-url'] = $_menu_item->url;
                 $menu_item_data[$menuid]['menu-item-object-id'] = $_POST['wp_quick_menu_item_object_id'][$menuid];
@@ -448,10 +476,13 @@ if (!class_exists('WP_Quick_Menu')) {
                 $menu_item_data[$menuid]['menu-item-target'] = $_POST['wp_quick_menu_item_target'][$menuid];
                 $menu_item_data[$menuid]['menu-item-classes'] = $_POST['wp_quick_menu_item_classes'][$menuid];
                 $menu_item_data[$menuid]['menu-item-attr-title'] = $_POST['wp_quick_menu_item_attr_title'][$menuid];
+
                 if (isset($_POST['wp_quick_menu_item_position'][$menuid]) && $_POST['wp_quick_menu_item_position'][$menuid] > 0) {
                     $menu_item_data[$menuid]['menu-item-position'] = $_POST['wp_quick_menu_item_position'][$menuid];
-                }
-            }
+                } // if
+
+            } // foreach
+
             return $menu_item_data;
         }
 
