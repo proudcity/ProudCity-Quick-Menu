@@ -1,12 +1,12 @@
 <?php
 
 /*
-  Plugin Name: WP Quick Menu
-  Plugin URI: http://solvease.com
-  Description: add page/post to menu on create or edit screen
-  Version: 1.0
-  Author: mahabub81
-  Author URI:http://solvease.com
+  Plugin Name: ProudCity Quick Menu
+  Plugin URI: https://proudcity.com
+  Description: Add page/post to menu on create or edit screen
+  Version: 1.2
+  Author: proudcity, curtismchale
+  Author URI:https://proudcity.com
   License: GPLv2 or later
  */
 
