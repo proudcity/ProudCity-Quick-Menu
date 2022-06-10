@@ -2,11 +2,11 @@
 
 /*
   Plugin Name: ProudCity Quick Menu
-  Plugin URI: https://proudcity.com
   Description: Add page/post to menu on create or edit screen
   Version: 1.2
+  Tested up to: 6.0.0
   Author: proudcity, curtismchale
-  Author URI:https://proudcity.com
+  Author URI: https://proudcity.com
   License: GPLv2 or later
  */
 

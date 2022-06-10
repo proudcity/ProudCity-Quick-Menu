@@ -1,4 +1,4 @@
-=== WordPress Quick Menu ===
+=== ProudCity Quick Menu ===
 
 Contributors: proudcity, curtismchale
 Tags: Menu, Page, Post, Admin, Quick Menu
@@ -9,6 +9,8 @@ License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 WordPress Quick Menu plugin allow you to add or remove page / post to multiple or single menu on page create or edit screen.
+
+Your theme MUST support Nav Menus for this plugin to work on your site.
 
 == Description ==
 - Easily add Page/Post to  menu On edit or create.
