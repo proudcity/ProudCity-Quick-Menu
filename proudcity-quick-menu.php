@@ -86,8 +86,12 @@ if (!class_exists('WP_Quick_Menu')) {
         } // wp_quick_menu_add_meta_box
 
         /**
-         * quick menu meta box call back
-         * @param type $post
+         * Our metabox to choose the menu our post entry should attach to
+         *
+         * @param   object          $post               required                The post object for the current post
+         * @uses    wp_nonce_field()                                            Creates a nonce to verify the form submission
+         * @uses    wp_get_nav_menus()                                          Returns all registered navigation menu objects
+         * @uses    $this->wp_quick_menu_check_menu_entry()
          */
         function wp_quick_menu_meta_box_call_back($post) {
 
@@ -592,8 +596,10 @@ if (!class_exists('WP_Quick_Menu')) {
         }
 
         /**
-         * get nav menu items
-         * @param type $nav_menu_id
+         * Retrieves the items in a nav menu
+         *
+         * @param   int         $nav_menu_id            required                ID of the nav menu we want items for
+         * @uses    wp_get_nav_menu_items()                                     Returns nav menu items given nav_id and args
          * @return array
          */
         private function wp_quick_menu_nav_menu_items($nav_menu_id) {
@@ -610,7 +616,7 @@ if (!class_exists('WP_Quick_Menu')) {
 
             $items = wp_get_nav_menu_items( absint( $nav_menu_id ), $args);
 
-            return $items;
+            return (object) $items;
         }
 
         /**
@@ -656,9 +662,17 @@ if (!class_exists('WP_Quick_Menu')) {
         }
 
         /**
-         * get the MENU entry
-         * @param type $nav_menu_id
-         * @param type $post_ID
+         * Returns the object for the nav_menu entry
+         *
+         * If we get a match between the $menu_item->object_id and $post_id
+         * that means our current page is in a nav menu and should be returned.
+         * If there is no match we return an empty class.
+         *
+         * @TODO should the return actually be null or something else
+         *
+         * @param   int             $nav_menu_id            required            ID of the nav menu we're checking for matches
+         * @param   int             $post_ID                required            the ID of the post we're matching to a nav menu entry
+         * @uses    $this->wp_quick_menu_nave_menu_items()                      returns all the items (entries) in a nav menu
          * @return stdClass
          */
         private function wp_quick_menu_check_menu_entry($nav_menu_id, $post_id) {
@@ -667,12 +681,13 @@ if (!class_exists('WP_Quick_Menu')) {
 
             foreach ($menu_items as $menu_item) {
                 if ( absint( $menu_item->object_id ) == absint( $post_id ) ) {
-                    return $menu_item;
+                    return (object) $menu_item;
                 }
             } // foreach
 
             return new stdClass();
-        }
+
+        } // wp_quick_menu_check_menu_entry
 
         /**
          * get class for menu entry
