@@ -153,7 +153,7 @@ if (!class_exists('WP_Quick_Menu')) {
                 }
             }
 
-            if (!isset($_GET['action'])) {
+            if (!isset($_GET['action']) && is_countable( $menu_items ) ) {
                 $possible_values[] = count($menu_items) + 1;
             }
 
