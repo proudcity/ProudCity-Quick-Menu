@@ -63,12 +63,12 @@ if (!class_exists('WP_Quick_Menu')) {
         function wp_quick_menu_add_meta_box() {
 
 			// @TODO add filterable array here so that the post_types supported can be expanded easily
-			$in_which_screens = array('post', 'page');
+			$in_which_screens = apply_filters( 'pcq_allowed_post_types', array( 'post', 'page' ) );
 
             foreach ($in_which_screens as $screen) {
 
                 add_meta_box(
-                    'wp_quick_menu_meta_box', __('Add to menu', 'wp_quick_menu'), array($this, 'wp_quick_menu_meta_box_call_back'), $screen, 'side', 'high'
+                    'wp_quick_menu_meta_box', __('Add to menu', 'wp_quick_menu'), array($this, 'wp_quick_menu_meta_box_call_back'), esc_attr( $screen ), 'side', 'high'
                 );
             }
         }

@@ -8,7 +8,7 @@ Stable tag: 1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-WordPress Quick Menu plugin allow you to add or remove page / post to multiple or single menu on page create or edit screen.
+ProudCity Quick Menu plugin allow you to add or remove page / post to multiple or single menu on page create or edit screen.
 
 Your theme MUST support Nav Menus for this plugin to work on your site.
 
@@ -20,6 +20,18 @@ Your theme MUST support Nav Menus for this plugin to work on your site.
 - There is automatic calculation for menu position, so don't afraid to provide a wrong position.
 - On deactivate of this plugin will not affect already added items to menu.
 - Easy to use user interface.
+
+=== Filters ===
+
+`pcq_allowed_post_types`: Used to add your own post types to the array of allowed post types.
+
+```
+function pcq_add_post_types( $post_types ){
+    $post_types[] = 'your_custom_post_type';
+    return (array) $post_types;
+}
+add_filter( 'pcq_allowed_post_types', 'pcq_add_post_types' );
+```
 
 == Installation ==
 1. Upload plugin to the `/wp-content/plugins/` directory
