@@ -336,38 +336,40 @@ if (!class_exists('WP_Quick_Menu')) {
             $nav_menu_items_logical = $this->wp_quick_menu_remove_specific_menu_entry_logically( (array) $nav_menu_items, absint( $values['menu-item-db-id'] ) );
 
             $calculated_position = $this->wp_quick_menu_calculate_accurate_menu_position($nav_menu_items_logical, $values);
-            $my_post = array('ID' => $exisint_menu_prop->ID, 'menu_order' => $calculated_position);
+            $my_post = array('ID' => absint( $exisint_menu_prop->ID ), 'menu_order' => absint( $calculated_position ) );
             wp_update_post($my_post);
 
-            return $calculated_position;
+            return absint( $calculated_position );
 
         }
 
         /**
          * calculate accurate menu position
 		 *
-         * @param int $menuID
-         * @param array $values
+         * @param   array       $nav_menu_items             required            Nav menu objects
+         * @param   array       $values                     required            Array of extra menu item metadata
+         *
          * @return boolean
          */
         private function wp_quick_menu_calculate_accurate_menu_position($nav_menu_items, $values) {
 
             // no parent selected and menu will be in last position
-            if ($values['menu-item-parent-id'] <= 0 && $values['menu-item-position'] >= count($nav_menu_items) + 1) {
+            if ( absint( $values['menu-item-parent-id'] ) <= 0 && absint( $values['menu-item-position'] ) >= count($nav_menu_items) + 1) {
                 return count($nav_menu_items) + 1;
             }
 
-            if ($values['menu-item-parent-id'] <= 0 && $values['menu-item-position'] <= count($nav_menu_items)) {
-                $calculatedpos = $this->wp_quick_menu_check_to_replace_exisitng_menu_item($nav_menu_items, $values['menu-item-position']);
-                $this->wp_quick_menu_update_existing_menu_order($calculatedpos, $nav_menu_items);
-                return $calculatedpos;
+            if ( absint( $values['menu-item-parent-id'] ) <= 0 && absint( $values['menu-item-position'] ) <= count($nav_menu_items)) {
+                $calculatedpos = $this->wp_quick_menu_check_to_replace_exisitng_menu_item( (array) $nav_menu_items, absint( $values['menu-item-position'] ) );
+                $this->wp_quick_menu_update_existing_menu_order( absint( $calculatedpos ), (array) $nav_menu_items);
+
+                return absint( $calculatedpos );
             }
 
             // parent selected
-            if ($values['menu-item-parent-id'] >= 0) {
-                $calculated_position = $this->wp_quick_menu_get_parent_position_with_child_count($nav_menu_items, $values['menu-item-parent-id'], $values['menu-item-position']);
-                if ($this->wp_quick_menu_update_existing_menu_order($calculated_position, $nav_menu_items)) {
-                    return $calculated_position;
+            if ( absint( $values['menu-item-parent-id'] ) >= 0) {
+                $calculated_position = $this->wp_quick_menu_get_parent_position_with_child_count( (array) $nav_menu_items, absint( $values['menu-item-parent-id'] ), absint( $values['menu-item-position'] ) );
+                if ($this->wp_quick_menu_update_existing_menu_order( absint( $calculated_position ), (array) $nav_menu_items )) {
+                    return absint( $calculated_position );
                 }
             }
 
@@ -386,9 +388,9 @@ if (!class_exists('WP_Quick_Menu')) {
             }
 
             foreach ($nav_menu_items as $nav_menu_item) {
-                if ($nav_menu_item->menu_order >= $current_position) {
+                if ( absint( $nav_menu_item->menu_order ) >= absint( $current_position ) ) {
                     if ((int) $nav_menu_item->menu_item_parent <= 0) {
-                        return $nav_menu_item->menu_order;
+                        return absint( $nav_menu_item->menu_order );
                     }
                 }
             }
@@ -405,10 +407,10 @@ if (!class_exists('WP_Quick_Menu')) {
 
                 foreach ($nav_menu_items as $nav_menu_item) {
 
-                    if ($nav_menu_item->menu_order >= $where_nod_to_update) {
+                    if ( absint( $nav_menu_item->menu_order ) >= $where_nod_to_update) {
 
                         $my_post = array();
-                        $my_post = array('ID' => absint( $nav_menu_item->ID ) , 'menu_order' => $nav_menu_item->menu_order + 1);
+                        $my_post = array('ID' => absint( $nav_menu_item->ID ) , 'menu_order' => absint( $nav_menu_item->menu_order + 1 ) );
                         wp_update_post($my_post);
 
 					} // if $nave_menu_item->menu_order
