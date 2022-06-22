@@ -105,17 +105,26 @@ if (!class_exists('WP_Quick_Menu')) {
                 }
             } // if ! empty $nav_menus
 
+            // @todo see about removing the locations and menu_locations vars as they do not seem to be used
             $locations = get_registered_nav_menus();
             $menu_locations = get_nav_menu_locations();
 
-            if (get_option('wp_quick_menu_format', 'accordion') === 'select') {
+            /**
+             * @todo there are no settings to change the format of the menu
+             *  - implement settings
+             *  - provide feedback on which item is actually selected if there is something in the menu
+             * @todo add settings to the plugin listing screen
+             *  - https://neliosoftware.com/blog/how-to-add-a-link-to-your-settings-in-the-wordpress-plugin-list/
+             */
+            $menu_format = get_option( 'wp_quick_menu_format', 'accordian' );
+
+            if ( esc_attr( $menu_format ) === 'select') {
               $num_menus = 0;
               foreach ($nav_menus as $key => $value) {
                 $num_menus += !empty($value->menu_items->ID) ? 1 : 0;
               }
               require_once dirname(__FILE__) . "/templates/menu_form_select_template.php";
-            }
-            else {
+            } else {
               wp_enqueue_script('accordion');
               require_once dirname(__FILE__) . "/templates/menu_form_template.php";
             }
@@ -600,7 +609,7 @@ if (!class_exists('WP_Quick_Menu')) {
          *
          * @param   int         $nav_menu_id            required                ID of the nav menu we want items for
          * @uses    wp_get_nav_menu_items()                                     Returns nav menu items given nav_id and args
-         * @return array
+         * @return  object      $items                                          The list of nav_menu objects for the menu
          */
         private function wp_quick_menu_nav_menu_items($nav_menu_id) {
 
