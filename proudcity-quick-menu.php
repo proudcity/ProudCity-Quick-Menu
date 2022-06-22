@@ -133,7 +133,16 @@ if (!class_exists('WP_Quick_Menu')) {
         } // wp_quick_menu_meta_box_call_back
 
         /**
+         * Returns the possible menu order positions for a menu.
          *
+         * This is used with wp_localize_script so that each menu item in a post/page/cpt
+         * shows the possible menu positions available for any menu item as you add
+         * the current page/post/cpt to the menu.
+         *
+         * @uses    wp_get_nav_menu_items()                                                 Returns all the menu objects
+         * @uses    $this->wp_quick_menu_nav_menu_items()                                   Returns the items in a menu given menu_id
+         * @uses    $this->wp_quick_menu_get_possible_menu_order_for_default_parent()       Returns the possible menu positions for the default parent item in the menu
+         * @uses    $this->wp_quick_menu_get_possible_menu_order_for_specific_parent()      Returns the possible menu positions for a specific parent item in a menu
          */
         private function wp_quick_menu_get_possible_order_for_all_parent() {
             $possible_values = array();
@@ -144,37 +153,56 @@ if (!class_exists('WP_Quick_Menu')) {
 
                 $possible_values[ absint( $nav_menu->term_id ) ] = array();
                 $menu_items = $this->wp_quick_menu_nav_menu_items( absint( $nav_menu->term_id ) );
-                $possible_values[ absint( $nav_menu->term_id ) ][0] = $this->wp_quick_menu_get_possible_menu_order_for_default_parent( (object) $menu_items );
+                $possible_values[ absint( $nav_menu->term_id ) ][0] = wp_kses_post( $this->wp_quick_menu_get_possible_menu_order_for_default_parent( (object) $menu_items ) );
 
                 if (!empty($menu_items)) {
                     foreach ($menu_items as $menu_item) {
-                        $possible_values[ absint( $nav_menu->term_id ) ][ absint( $menu_item->ID ) ] = $this->wp_quick_menu_get_possible_menu_order_for_specific_parent($menu_items, $menu_item->ID, $menu_item->menu_order);
+                        $possible_values[ absint( $nav_menu->term_id ) ][ absint( $menu_item->ID ) ] = wp_kses_post( $this->wp_quick_menu_get_possible_menu_order_for_specific_parent( (object) $menu_items, (int) $menu_item->ID, (int) $menu_item->menu_order) );
                     }
                 }
             } // foreach
 
-            return $possible_values;
+            return (array) $possible_values;
         }
 
+        /**
+         * Returns the possible order for menu items
+         *
+         * @return  string          Text telling the user what the possible order values are for an item
+         */
         private function wp_quick_menu_get_possible_menu_order_for_default_parent($menu_items) {
             if (empty($menu_items)) {
-                return '<span class="wp-quick-menu-strong">' . __('Possible Positions: ', 'wp_quick_menu') . '</span> 1';
+                return '<span class="wp-quick-menu-strong">' . __('Possible Positions: ', 'proudcity_quick_menu') . '</span> 1';
             }
+
             $possible_values = array();
+
             foreach ($menu_items as $menu_item) {
-                if ($menu_item->menu_item_parent == 0) {
-                    $possible_values[] = $menu_item->menu_order;
+
+                if ( absint( $menu_item->menu_item_parent ) === 0) {
+                    $possible_values[] = absint( $menu_item->menu_order );
                 }
-            }
+
+            } // foreach
 
             if (!isset($_GET['action']) && is_countable( $menu_items ) ) {
-                $possible_values[] = count($menu_items) + 1;
+                $possible_values[] = count( $menu_items ) + 1;
             }
 
 
-            return '<span class="wp-quick-menu-strong">' . __('Possible Positions: ', 'wp_quick_menu') . '</span>' . implode(", ", $possible_values);
-        }
+            return '<span class="wp-quick-menu-strong">' . __('Possible Positions: ', 'proudcity_quick_menu') . '</span>' . implode(", ", (array) $possible_values );
 
+        } // wp_quick_menu_get_possible_menu_order_for_default_parent
+
+        /**
+         * Returns possible menu order values for a specific menu item parent
+         *
+         * @access private
+         *
+         * @param   object      $menu_items             required                the menu items object we're parsing
+         * @param   int         $parent                 required                ID of the parent item we're looking at
+         * @param   int         $current_order          required                Current order int value
+         */
         private function wp_quick_menu_get_possible_menu_order_for_specific_parent($menu_items, $parent, $current_order) {
             $possible_position = array();
             $current_order += 1;
@@ -187,7 +215,7 @@ if (!class_exists('WP_Quick_Menu')) {
             }
 
 
-            return '<span class="wp-quick-menu-strong">' . __('Possible Positions: ', 'wp_quick_menu') . '</span>' . implode(", ", range($current_order, $current_order + $child));
+            return '<span class="wp-quick-menu-strong">' . __('Possible Positions: ', 'proudcity_quick_menu') . '</span>' . implode(", ", range($current_order, $current_order + $child));
         }
 
         /**
