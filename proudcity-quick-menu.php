@@ -130,7 +130,7 @@ if (!class_exists('WP_Quick_Menu')) {
 
                 $possible_values[ absint( $nav_menu->term_id ) ] = array();
                 $menu_items = $this->wp_quick_menu_nav_menu_items( absint( $nav_menu->term_id ) );
-                $possible_values[$nav_menu->term_id][0] = $this->wp_quick_menu_get_possible_menu_order_for_default_parent($menu_items);
+                $possible_values[ absint( $nav_menu->term_id ) ][0] = $this->wp_quick_menu_get_possible_menu_order_for_default_parent( (object) $menu_items );
 
                 if (!empty($menu_items)) {
                     foreach ($menu_items as $menu_item) {
