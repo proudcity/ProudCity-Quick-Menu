@@ -125,11 +125,12 @@ if (!class_exists('WP_Quick_Menu')) {
               }
               require_once dirname(__FILE__) . "/templates/menu_form_select_template.php";
             } else {
+                // users never see this template unless they manually set get_option( 'wp_quick_menu_format' ) as there is no settings page currently
               wp_enqueue_script('accordion');
               require_once dirname(__FILE__) . "/templates/menu_form_template.php";
             }
 
-        }
+        } // wp_quick_menu_meta_box_call_back
 
         /**
          *

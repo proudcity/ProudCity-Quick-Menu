@@ -1,3 +1,7 @@
+<!--
+@todo there is no way to use this currently
+    - unless the user can manually set the get_option value for `wp_quick_menu_format` they will never see this template
+-->
 <div class="accordion-container">
     <?php if (!empty($nav_menus)) { ?>
         <?php foreach ($nav_menus as $nav_menu) { ?>
