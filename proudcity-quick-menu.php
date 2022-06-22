@@ -58,20 +58,32 @@ if (!class_exists('WP_Quick_Menu')) {
         }
 
         /**
-         * add the meta bos
+         * Adds the metabox to our post types
+         *
+         * @since 1.2
+         * @author Curtis McHale
+         * @access public
+         *
+         * @uses add_meta_box                   Adds the metabox to our post types
          */
         function wp_quick_menu_add_meta_box() {
 
-			// @TODO add filterable array here so that the post_types supported can be expanded easily
+            /**
+             * Allows end users to add their own post types, or remove the default post types
+             *
+             * @since 1.2
+             *
+             * @param   array       The existing array of allowed post types
+             */
 			$in_which_screens = apply_filters( 'pcq_allowed_post_types', array( 'post', 'page' ) );
 
             foreach ($in_which_screens as $screen) {
-
                 add_meta_box(
                     'wp_quick_menu_meta_box', __('Add to menu', 'wp_quick_menu'), array($this, 'wp_quick_menu_meta_box_call_back'), esc_attr( $screen ), 'side', 'high'
                 );
             }
-        }
+
+        } // wp_quick_menu_add_meta_box
 
         /**
          * quick menu meta box call back
