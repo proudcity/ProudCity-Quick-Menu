@@ -219,8 +219,13 @@ if (!class_exists('WP_Quick_Menu')) {
         }
 
         /**
-         * save the meta box data
-         * @param int $post_ID
+         * Saving the data in the metabox
+         *
+         * @param   int         $post_ID            required                post_id for the post we're currently saving
+         * @uses    wp_verify_nonce()                                       makes sure we have a valid nonce
+         * @uses    current_user_can()                                      TRUE if the current user has the listed capability
+         * @uses    $this->wp_quick_menu_get_menu_id()
+         * @uses    $this->wp_quick_menu_get_menu_remove()
          * @return boolean
          */
         function wp_quick_menu_save_meta_box_data($post_id) {
@@ -236,7 +241,7 @@ if (!class_exists('WP_Quick_Menu')) {
                 return;
             }
             // Check the user's permissions.
-            if (isset($_POST['post_type']) && 'page' == $_POST['post_type']) {
+            if (isset($_POST['post_type']) && 'page' == esc_attr( $_POST['post_type'] ) ) {
 
                 if (!current_user_can('edit_page', absint( $post_id ) )) {
                     return;
@@ -309,22 +314,26 @@ if (!class_exists('WP_Quick_Menu')) {
         }
 
         /**
+         * Saves the updated position of a menu item
          *
-         * @param type $menuID
-         * @param type $values
+         * @param   int         $menuID         required                            ID of the menu we're saving
+         * @param   array       $values         required                            array of metadata with values
+         * @uses    $this->wp_quick_menu_nav_menu_items()                           given id it returns a nav menu object
+         * @uses    $this->wp_quick_menu_get_specific_menu_entry()                  Returns a menu object for a specific menu item
+         * @uses    $this->wp_quick_menu_remove_specific_menu_entry_logically()
          * @return int
          */
         private function wp_quick_menu_update_menu_item_postion($menuID, $values) {
 
             $nav_menu_items = $this->wp_quick_menu_nav_menu_items( absint( $menuID ) );
-            $exisint_menu_prop = $this->wp_quick_menu_get_specific_menu_entry($nav_menu_items, $values['menu-item-db-id']);
+            $exisint_menu_prop = $this->wp_quick_menu_get_specific_menu_entry( (array) $nav_menu_items, absint( $values['menu-item-db-id'] ) );
 
             // well no change in menu Item Position
-            if ($values['menu-item-position'] == $exisint_menu_prop->menu_order && $values['menu-item-parent-id'] == $exisint_menu_prop->menu_item_parent) {
-                return $exisint_menu_prop->menu_order;
+            if ( absint( $values['menu-item-position'] ) === absint( $exisint_menu_prop->menu_order ) && absint( $values['menu-item-parent-id'] ) == absint( $exisint_menu_prop->menu_item_parent ) ) {
+                return absint( $exisint_menu_prop->menu_order );
             }
 
-            $nav_menu_items_logical = $this->wp_quick_menu_remove_specific_menu_entry_logically($nav_menu_items, $values['menu-item-db-id']);
+            $nav_menu_items_logical = $this->wp_quick_menu_remove_specific_menu_entry_logically( (array) $nav_menu_items, absint( $values['menu-item-db-id'] ) );
 
             $calculated_position = $this->wp_quick_menu_calculate_accurate_menu_position($nav_menu_items_logical, $values);
             $my_post = array('ID' => $exisint_menu_prop->ID, 'menu_order' => $calculated_position);
@@ -468,12 +477,13 @@ if (!class_exists('WP_Quick_Menu')) {
             $menu_ids = array();
 
             if (isset($_POST['wp_quick_nav_menu'])) {
-                $menus =  $_POST['wp_quick_nav_menu'];
+
+                $menus = absint( $_POST['wp_quick_nav_menu'] );
                 if (is_array($menus)) {
                     foreach ($menus as $value) {
                         $menu_id = (int) $value;
                         if ($menu_id > 0) {
-                            $menu_ids[] = $menu_id;
+                            $menu_ids[] = absint( $menu_id );
                         }
                     }
                 }
@@ -485,7 +495,7 @@ if (!class_exists('WP_Quick_Menu')) {
 
             unset($_POST['wp_quick_nav_menu']);
 
-            return $menu_ids;
+            return (array) $menu_ids;
         }
 
         /**
@@ -658,16 +668,17 @@ if (!class_exists('WP_Quick_Menu')) {
         }
 
         /**
-         * get specific menu entry
-         * @param array $menu_items
-         * @param int $db_id
+         * Get the data for a specific menu item
+         *
+         * @param   array           $menu_items             required                Menu objects
+         * @param   int             $db_id                  required                The database id for the menu item
          * @return object
          */
         private function wp_quick_menu_get_specific_menu_entry($menu_items, $db_id) {
 
             foreach ($menu_items as $key => $menu_item) {
                 if ( absint( $menu_item->ID )  == absint( $db_id ) ) {
-                    return $menu_items[$key];
+                    return (object) $menu_items[ absint( $key ) ];
                 }
             }
 
@@ -675,9 +686,10 @@ if (!class_exists('WP_Quick_Menu')) {
         }
 
         /**
+         * Removes a menu item
          *
-         * @param array $menu_items
-         * @param int $db_id
+         * @param   array           $menu_items                 required                    menu objects
+         * @param   int             $db_id                      required                    The database id for the menu item
          * @return object
          */
         private function wp_quick_menu_remove_specific_menu_entry_logically($menu_items, $db_id) {
@@ -693,11 +705,13 @@ if (!class_exists('WP_Quick_Menu')) {
 
                 if ($minus > 0) {
                     $menu_items[$key]->menu_order = $menu_items[$key]->menu_order - 1;
-                    wp_update_post($menu_items[$key]);
+                    wp_update_post($menu_items[ absint( $key ) ]);
                 }
-            }
-            return $menu_items;
-        }
+            } // foreach
+
+            return (object) $menu_items;
+
+        } // wp_quick_menu_remove_specific_menu_entry_logically
 
         /**
          * Returns the object for the nav_menu entry
