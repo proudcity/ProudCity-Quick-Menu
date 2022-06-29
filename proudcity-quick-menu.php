@@ -630,7 +630,6 @@ if (!class_exists('WP_Quick_Menu')) {
             for ($i = 1; $i <= $toal_menu_count; $i++) {
                 $selected = '';
                 if ( isset( $nav_menu->menu_items ) && ! empty( $nav_menu->menu_items ) && ( ! empty( $nav_menu->menut_items->menu_order ) && $i == $nav_menu->menu_items->menu_order) ) {
-                    error_log( print_r( $nav_menu, true ) );
                     $status = true;
                     $selected = "selected";
                 }
