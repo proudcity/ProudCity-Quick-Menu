@@ -281,12 +281,15 @@ if (!class_exists('WP_Quick_Menu')) {
 
             foreach ($menu_values as $menuID => $values) {
                 if (!empty($remove_menu_ids) && in_array($menuID, $remove_menu_ids) && isset($values['menu-item-db-id']) && $values['menu-item-db-id'] > 0) {
-                    $this->wp_quick_menu_remove_menu_entry($values['menu-item-db-id']);
+                    $this->wp_quick_menu_remove_menu_entry( absint( $values['menu-item-db-id'] ) );
                     continue;
                 }
 
                 if (!isset($values['menu-item-db-id']) || $values['menu-item-db-id'] <= 0) {
-                    $nav_menu_items = $this->wp_quick_menu_nav_menu_items($menuID);
+                    $nav_menu_items = $this->wp_quick_menu_nav_menu_items( absint( $menuID ) );
+
+                    error_log( print_r( $nav_menu_items, true ) );
+
                     $calculated_postition = $this->wp_quick_menu_calculate_accurate_menu_position($nav_menu_items, $values);
                     $values['menu-item-position'] = $calculated_postition;
                     $saved_items[] = $values;
@@ -354,16 +357,20 @@ if (!class_exists('WP_Quick_Menu')) {
         private function wp_quick_menu_calculate_accurate_menu_position($nav_menu_items, $values) {
 
             // no parent selected and menu will be in last position
-            if ( absint( $values['menu-item-parent-id'] ) <= 0 && absint( $values['menu-item-position'] ) >= count($nav_menu_items) + 1) {
-                return count($nav_menu_items) + 1;
-            }
+            if ( is_countable( $nav_menu_items ) ){
+                if ( absint( $values['menu-item-parent-id'] ) <= 0 && absint( $values['menu-item-position'] ) >= count($nav_menu_items) + 1) {
+                    return count($nav_menu_items) + 1;
+                }
+            } // is_countable
 
-            if ( absint( $values['menu-item-parent-id'] ) <= 0 && absint( $values['menu-item-position'] ) <= count($nav_menu_items)) {
-                $calculatedpos = $this->wp_quick_menu_check_to_replace_exisitng_menu_item( (array) $nav_menu_items, absint( $values['menu-item-position'] ) );
-                $this->wp_quick_menu_update_existing_menu_order( absint( $calculatedpos ), (array) $nav_menu_items);
+            if ( is_countable( $nav_menu_items) ){
+                if ( absint( $values['menu-item-parent-id'] ) <= 0 && absint( $values['menu-item-position'] ) <= count($nav_menu_items)) {
+                    $calculatedpos = $this->wp_quick_menu_check_to_replace_exisitng_menu_item( (array) $nav_menu_items, absint( $values['menu-item-position'] ) );
+                    $this->wp_quick_menu_update_existing_menu_order( absint( $calculatedpos ), (array) $nav_menu_items);
 
-                return absint( $calculatedpos );
-            }
+                    return absint( $calculatedpos );
+                }
+            } // is_countable
 
             // parent selected
             if ( absint( $values['menu-item-parent-id'] ) >= 0) {
@@ -403,6 +410,8 @@ if (!class_exists('WP_Quick_Menu')) {
          */
         private function wp_quick_menu_update_existing_menu_order($where_nod_to_update, $nav_menu_items) {
 
+            error_log( 'nod '. print_r( $where_nod_to_update, true ) );
+
             if (!empty($nav_menu_items)) {
 
                 foreach ($nav_menu_items as $nav_menu_item) {
@@ -433,6 +442,10 @@ if (!class_exists('WP_Quick_Menu')) {
 
             if (!empty($nav_menu_items)) {
 
+                // @todo just defined these to kill errors need to really figure them out and make sure the code works
+                $min_position = 0;
+                $max_position = 0;
+
                 $child = 0;
                 $parent_found = false;
 
@@ -450,19 +463,19 @@ if (!class_exists('WP_Quick_Menu')) {
 
                 // if parent has no childs so position will be just after the parent
                 if ($min_position === $max_position) {
-                    return $min_position;
+                    return absint( $min_position );
                 }
 
                 if (($current_position >= $min_position) && ($current_position <= $max_position)) {
-                    return $current_position;
+                    return absint( $current_position );
                 }
 
                 if ($current_position > $max_position) {
-                    return $max_position;
+                    return absint( $max_position );
                 }
 
                 // return the max number of child
-                return $max_postion;
+                return absint( $max_position );
             }
 
 
@@ -616,7 +629,8 @@ if (!class_exists('WP_Quick_Menu')) {
 
             for ($i = 1; $i <= $toal_menu_count; $i++) {
                 $selected = '';
-                if ($i == $nav_menu->menu_items->menu_order) {
+                if ( isset( $nav_menu->menu_items ) && ! empty( $nav_menu->menu_items ) && ( ! empty( $nav_menu->menut_items->menu_order ) && $i == $nav_menu->menu_items->menu_order) ) {
+                    error_log( print_r( $nav_menu, true ) );
                     $status = true;
                     $selected = "selected";
                 }
@@ -821,13 +835,24 @@ if (!class_exists('WP_Quick_Menu')) {
         }
 
         /**
-         * get Menu parent
-         * @param type $nav_menu
-         * @return int
+         * Returns the parent item for a menu item if it exists
+         *
+         * @param   object          $nav_menu           required                    The object we should be checking
+         * @return  int             $parent                                         ID of the parent item
          */
         private function wp_quick_menu_get_menu_item_parent($nav_menu) {
-            return (int) $nav_menu->menu_items->menu_item_parent;
-        }
+
+            if ( isset( $nav_menu->menu_items ) && ! empty( $nav_menu->menu_items->menu_item_parent ) ){
+
+            error_log( print_r( $nav_menu, true ) );
+                $parent = (int) $nav_menu->menu_items->menu_item_parent;
+            } else {
+                $parent = 0;
+            }
+
+            return absint( $parent );
+
+        } // wp_quick_menu_get_menu_item_parent
 
     }
 

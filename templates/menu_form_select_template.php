@@ -1,4 +1,8 @@
-<?php if (!empty($nav_menus)) { ?>
+<?php if (!empty($nav_menus)) {
+//  echo '<pre>';
+//  print_r( $nav_menus )
+//  echo '</pre>';
+    ?>
 
     <div class="inside" style="margin:6px;">
 
