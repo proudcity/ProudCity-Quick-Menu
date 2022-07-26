@@ -23,6 +23,9 @@
     margin: 0;
 }
 
+.pc_quick_menu_position{
+    overflow:hidden;
+}
 
 #wp_quick_menu_meta_box .inside .accordion-section-title{
     border-left: none;
