@@ -50,11 +50,13 @@ if (!class_exists('WP_Quick_Menu')) {
          */
         function wp_quick_menu_add_css_js() {
             wp_enqueue_style('wp_quick_menu_style', plugins_url('css/style.css', __FILE__));
-            wp_register_script('wp_quick_menu_javascript', plugins_url('js/script.js', __FILE__));
 
-            //$translation_array = array('some_string' => __('Some string to translate'), 'a_value' => '10');
-            wp_localize_script('wp_quick_menu_javascript', 'possible_values', $this->wp_quick_menu_get_possible_order_for_all_parent());
-            wp_enqueue_script('wp_quick_menu_javascript');
+            // scripts plugin
+            wp_enqueue_script('pc_quick_menu_scripts', plugins_url( '/proudcity-quick-menu/js/script.js' ), array('jquery'), '1.2', true);
+            wp_localize_script( 'pc_quick_menu_scripts', 'PCQuickMenuScripts', array(
+                'ajaxurl'           => admin_url( 'admin-ajax.php' ),
+                'pc_quick_menu_nonce' => wp_create_nonce( 'pc_quick_menu_nonce' ),
+            ) );
         }
 
         /**
