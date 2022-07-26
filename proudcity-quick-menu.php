@@ -141,18 +141,20 @@ if (!class_exists('WP_Quick_Menu')) {
         private static function pc_quick_build_menu_interface( $nav_menus ){ ?>
 
             <div class="inside pc_quick_menu_wrapper" style="margin:6px;">
-                <p><div>
-                    <label for="wp_quick_nav_menu"><?php _e( 'Menu', 'wp_quick_menu' ); ?></label>
-                </div></p>
+                <p>
+                    <div>
+                        <label for="wp_quick_nav_menu"><?php _e( 'Menu', 'wp_quick_menu' ); ?></label>
+                    </div>
 
-                <select id="wp_quick_nav_menu" name="wp_quick_nav_menu">
-                    <option value=""><?php echo __( '- No Menu- ', 'wp_quick_menu' ); ?></option>
-                    <?php echo self::pc_quick_menu_return_menu_options( $nav_menus ); ?>
-                </select>
-
-                </select>
+                    <select id="wp_quick_nav_menu" name="wp_quick_nav_menu">
+                        <option value=""><?php echo __( '- No Menu- ', 'wp_quick_menu' ); ?></option>
+                        <?php echo self::pc_quick_menu_return_menu_options( $nav_menus ); ?>
+                    </select>
+                </p>
 
             </div><!-- /.inside -->
+
+            <div class="pc_quick_menu_position"></div>
 
         <?php
         } // pc_quick_build_menu_interface
