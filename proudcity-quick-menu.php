@@ -63,10 +63,11 @@ if (!class_exists('WP_Quick_Menu')) {
             // @todo deal with child items in a menu as well
 
             $html .= '<ul class="pc_quick_menu_item_position">';
-            foreach( $menu_items as $item ){
-                $html .= '<li class="pc_quick_menu_item" data-post_id="'. absint( $item->ID ) .'" data-item_order="'. $count .'">'. esc_attr( $item->title ) .'</li>';
-                $count++;
-            }
+                foreach( $menu_items as $item ){
+                    $html .= '<li class="pc_quick_menu_item" data-post_id="'. absint( $item->ID ) .'" data-item_order="'. $count .'">'. esc_attr( $item->title ) .'</li>';
+                    $count++;
+                }
+                $html .= self::get_current_item( absint( $_POST['current_post_id'] ), $count );
             $html .= '</ul>';
 
             $success = true;
@@ -80,6 +81,20 @@ if (!class_exists('WP_Quick_Menu')) {
             wp_send_json_success( $data );
         } // get_sku
 
+        /**
+         * Retrieves the HTML for the current item
+         */
+        public static function get_current_item( $post_id, $order ){
+
+            $html = '';
+
+            $title = empty( get_post_field( 'title', absint( $post_id ) ) ) ? get_post_field( 'post_title', absint( $post_id ) ) : get_post_field( 'title', absint( $post_id ) );
+
+            $html .= '<li class="pc_quick_menu_item current-menu-item" data-post_id="'. absint( $post_id ) .'" data-item_order="'. absint( $order ) .'">'. esc_attr( $title ) .'</li>';
+
+            return $html;
+
+        } // get_current_item
 
         /**
          * add required JS and CSS

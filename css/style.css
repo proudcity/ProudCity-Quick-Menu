@@ -27,6 +27,24 @@
     overflow:hidden;
 }
 
+.pc_quick_menu_item{
+    padding:3px 5px;
+    margin:7px 5px;
+    border:1px solid #ccc;
+    border-radius:3px;
+    background:white;
+    box-shadow:2px 2px 2px #ccc;
+}
+
+.pc_quick_menu_item:hover{
+    cursor:grab;
+}
+
+.pc_quick_menu_item.current-menu-item{
+    background:#0071bc;
+    color:white;
+}
+
 #wp_quick_menu_meta_box .inside .accordion-section-title{
     border-left: none;
     border-right: none;
