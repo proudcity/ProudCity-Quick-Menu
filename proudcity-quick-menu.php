@@ -154,9 +154,11 @@ if (!class_exists('WP_Quick_Menu')) {
                     </select>
                 </p>
 
-            </div><!-- /.inside -->
+                <div class="pc_quick_menu_position">
+                    <span class="spinner"></span>
+                </div>
 
-            <div class="pc_quick_menu_position"></div>
+            </div><!-- /.inside -->
 
         <?php
         } // pc_quick_build_menu_interface
