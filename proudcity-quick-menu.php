@@ -105,6 +105,7 @@ if (!class_exists('WP_Quick_Menu')) {
                 }
             } // if ! empty $nav_menus
 
+            self::pc_quick_build_menu_interface( $nav_menus );
             // @todo see about removing the locations and menu_locations vars as they do not seem to be used
             $locations = get_registered_nav_menus();
             $menu_locations = get_nav_menu_locations();
@@ -118,6 +119,7 @@ if (!class_exists('WP_Quick_Menu')) {
              */
             $menu_format = get_option( 'wp_quick_menu_format', 'accordian' );
 
+            /*
             if ( esc_attr( $menu_format ) === 'select') {
               $num_menus = 0;
               foreach ($nav_menus as $key => $value) {
@@ -129,8 +131,51 @@ if (!class_exists('WP_Quick_Menu')) {
               wp_enqueue_script('accordion');
               require_once dirname(__FILE__) . "/templates/menu_form_template.php";
             }
+            */
 
         } // wp_quick_menu_meta_box_call_back
+
+        /**
+         * Builds out our menu interface for using menus on post types
+         */
+        private static function pc_quick_build_menu_interface( $nav_menus ){ ?>
+
+            <div class="inside pc_quick_menu_wrapper" style="margin:6px;">
+                <p><div>
+                    <label for="wp_quick_nav_menu"><?php _e( 'Menu', 'wp_quick_menu' ); ?></label>
+                </div></p>
+
+                <select id="wp_quick_nav_menu" name="wp_quick_nav_menu">
+                    <option value=""><?php echo __( '- No Menu- ', 'wp_quick_menu' ); ?></option>
+                    <?php echo self::pc_quick_menu_return_menu_options( $nav_menus ); ?>
+                </select>
+
+                </select>
+
+            </div><!-- /.inside -->
+
+        <?php
+        } // pc_quick_build_menu_interface
+
+        /**
+         * Builds the options for our nav menus
+         *
+         * @since 1.2
+         */
+        private static function pc_quick_menu_return_menu_options( $nav_menus ){
+
+            $html = '';
+
+            foreach( $nav_menus as $nav_menu ){
+                // @todo deal with selected state
+                $html .= '<option value="'. absint( $nav_menu->term_id ) .'">';
+                    $html .= esc_attr( $nav_menu->name );
+                $html .= '</option>';
+            }
+
+            return $html;
+
+        } // pc_quick_return_menu_options
 
         /**
          * Returns the possible menu order positions for a menu.
@@ -333,12 +378,17 @@ if (!class_exists('WP_Quick_Menu')) {
 
             // well no change in menu Item Position
             if ( absint( $values['menu-item-position'] ) === absint( $exisint_menu_prop->menu_order ) && absint( $values['menu-item-parent-id'] ) == absint( $exisint_menu_prop->menu_item_parent ) ) {
+                error_log( 'no change' );
                 return absint( $exisint_menu_prop->menu_order );
             }
 
             $nav_menu_items_logical = $this->wp_quick_menu_remove_specific_menu_entry_logically( (array) $nav_menu_items, absint( $values['menu-item-db-id'] ) );
 
             $calculated_position = $this->wp_quick_menu_calculate_accurate_menu_position($nav_menu_items_logical, $values);
+
+            //error_log( 'calculated psition '. print_r( $calculated_position, true ) );
+            //error_log( 'exisint id ' . $exisint_menu_prop->ID );
+
             $my_post = array('ID' => absint( $exisint_menu_prop->ID ), 'menu_order' => absint( $calculated_position ) );
             wp_update_post($my_post);
 
@@ -356,15 +406,23 @@ if (!class_exists('WP_Quick_Menu')) {
          */
         private function wp_quick_menu_calculate_accurate_menu_position($nav_menu_items, $values) {
 
+            error_log( 'values ' . print_r( $values, TRUE ) );
+
+            // get item order when it current item is NOT a sub-item
+
             // no parent selected and menu will be in last position
-            if ( is_countable( $nav_menu_items ) ){
-                if ( absint( $values['menu-item-parent-id'] ) <= 0 && absint( $values['menu-item-position'] ) >= count($nav_menu_items) + 1) {
-                    return count($nav_menu_items) + 1;
-                }
-            } // is_countable
+            if ( 0 == absint( $values['menu-item-parent-id'] ) ) {
+                // so this saves the position of the menu if the current item is NOT a child item
+                // but then it always assumes that the item is the last item no matter what you set
+                // in theory it should put the item last if there has been no definition because the item has just been added to the menu
+                // heck, even better would be to show all the the menu items and have a draggable interface to reorder items
+                error_log( 'no parent' );
+                return 8; //count( get_object_vars( $nav_menu_items ) ) + 1;
+            }
 
             if ( is_countable( $nav_menu_items) ){
                 if ( absint( $values['menu-item-parent-id'] ) <= 0 && absint( $values['menu-item-position'] ) <= count($nav_menu_items)) {
+                    error_log( 'option 2' );
                     $calculatedpos = $this->wp_quick_menu_check_to_replace_exisitng_menu_item( (array) $nav_menu_items, absint( $values['menu-item-position'] ) );
                     $this->wp_quick_menu_update_existing_menu_order( absint( $calculatedpos ), (array) $nav_menu_items);
 
@@ -372,9 +430,11 @@ if (!class_exists('WP_Quick_Menu')) {
                 }
             } // is_countable
 
+            // get menu order when item IS a child of another item
             // parent selected
             if ( absint( $values['menu-item-parent-id'] ) >= 0) {
                 $calculated_position = $this->wp_quick_menu_get_parent_position_with_child_count( (array) $nav_menu_items, absint( $values['menu-item-parent-id'] ), absint( $values['menu-item-position'] ) );
+                error_log( 'has parrent' );
                 if ($this->wp_quick_menu_update_existing_menu_order( absint( $calculated_position ), (array) $nav_menu_items )) {
                     return absint( $calculated_position );
                 }
