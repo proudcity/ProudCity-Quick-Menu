@@ -53,12 +53,24 @@ if (!class_exists('WP_Quick_Menu')) {
         public function get_menu_items(){
             check_ajax_referer( 'pc_quick_menu_nonce', 'security' );
 
-            $success = false;
-            $message = 'The test email was NOT sent';
+            $html = '';
+            $count = 0;
+            $menu_items = wp_get_nav_menu_items(
+                absint( $_POST['selected_menu'] )
+            );
+
+            // @todo if empty handling
+
+            foreach( $menu_items as $item ){
+                $html .= '<p class="pc_quick_menu_item" data-post_id="'. absint( $item->ID ) .'" data-item_order="'. $count .'">'. esc_attr( $item->title ) .'</option>';
+                $count++;
+            }
+            $success = true;
+            $value = $html;
 
             $data = array(
                 'success' => (bool) $success,
-                'message' => wp_kses_post( $message ),
+                'value' => $value,
             );
 
             wp_send_json_success( $data );

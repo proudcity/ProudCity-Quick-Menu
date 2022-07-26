@@ -28,7 +28,7 @@ jQuery(document).ready(function($) {
                 $(spinner).css('visibility', 'hidden' );
 
                 if ( true === response.data.success ){
-                    console.log( 'succes' );
+                    $(menuPositionSelect).empty().append( response.data.value );
                 } // yup
 
                 if ( false === response.data.success ){
