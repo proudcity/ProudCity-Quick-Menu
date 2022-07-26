@@ -43,7 +43,27 @@ if (!class_exists('WP_Quick_Menu')) {
             add_action('admin_enqueue_scripts', array($this, 'wp_quick_menu_add_css_js'));
             add_action('add_meta_boxes', array($this, 'wp_quick_menu_add_meta_box'));
             add_action('save_post', array($this, 'wp_quick_menu_save_meta_box_data'));
+
+            add_action( 'wp_ajax_pc_quick_get_menu_items', array( $this, 'get_menu_items' ) );
         }
+
+        /**
+         * Returns the items in a menu given the Menu ID
+         */
+        public function get_menu_items(){
+            check_ajax_referer( 'pc_quick_menu_nonce', 'security' );
+
+            $success = false;
+            $message = 'The test email was NOT sent';
+
+            $data = array(
+                'success' => (bool) $success,
+                'message' => wp_kses_post( $message ),
+            );
+
+            wp_send_json_success( $data );
+        } // get_sku
+
 
         /**
          * add required JS and CSS

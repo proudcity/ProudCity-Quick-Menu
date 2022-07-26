@@ -10,14 +10,22 @@ jQuery(document).ready(function($) {
         var selectedMenu = $(this).val();
         var currentPostID = $('#post_ID').val();
 
+        console.log( currentPostID );
+
+        // showing spinner
+        $(spinner).css('visibility', 'visible' );
+
         var data = {
-            'action': '$thing',
-            'security': AllEmail.nonce
+            'action': 'pc_quick_get_menu_items',
+            'selected_menu': selectedMenu,
+            'current_post_id': currentPostID,
+            'security': PCQuickMenuScripts.pc_quick_menu_nonce
         }
 
-        $.post( AllEmail.ajaxurl, data, function( response ) {
+        $.post( PCQuickMenuScripts.ajaxurl, data, function( response ) {
 
-                // @todo hide spinner
+                // hiding spinner
+                $(spinner).css('visibility', 'hidden' );
 
                 if ( true === response.data.success ){
                     console.log( 'succes' );
