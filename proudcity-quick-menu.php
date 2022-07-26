@@ -60,11 +60,15 @@ if (!class_exists('WP_Quick_Menu')) {
             );
 
             // @todo if empty handling
+            // @todo deal with child items in a menu as well
 
+            $html .= '<ul class="pc_quick_menu_item_position">';
             foreach( $menu_items as $item ){
-                $html .= '<p class="pc_quick_menu_item" data-post_id="'. absint( $item->ID ) .'" data-item_order="'. $count .'">'. esc_attr( $item->title ) .'</option>';
+                $html .= '<li class="pc_quick_menu_item" data-post_id="'. absint( $item->ID ) .'" data-item_order="'. $count .'">'. esc_attr( $item->title ) .'</li>';
                 $count++;
             }
+            $html .= '</ul>';
+
             $success = true;
             $value = $html;
 

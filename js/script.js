@@ -29,6 +29,7 @@ jQuery(document).ready(function($) {
 
                 if ( true === response.data.success ){
                     $(menuPositionSelect).empty().append( response.data.value );
+                    $('.pc_quick_menu_item_position').sortable();
                 } // yup
 
                 if ( false === response.data.success ){
