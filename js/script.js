@@ -37,14 +37,18 @@ jQuery(document).ready(function($) {
                         stop: function( event, ui ){
                             var start = ui.item.data('item_order');
                             if ( start != ui.item.index()){
-                                console.log('moved');
+                                //console.log('moved');
                             } else {
-                                console.log('not moved');
+                                // the update function runs before stop so it may log as
+                                // not moved once the elements are updated
+                                //console.log('not moved');
                             }
 
                         },
                         update: function( event, ui ){
-                            console.log('updating');
+                            $(this).children('li').each(function(index){
+                               $(this).attr('data-item_order', index);
+                            });
                         }
                     });
                     $('.pc_quick_menu_item_position').disableSelection();
