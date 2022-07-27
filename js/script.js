@@ -30,7 +30,22 @@ jQuery(document).ready(function($) {
                 if ( true === response.data.success ){
                     $(menuPositionSelect).empty().append( response.data.value );
                     $('.pc_quick_menu_item_position').sortable({
-                        placeholder: "pc-quick-drop-target"
+                        placeholder: "pc-quick-drop-target",
+                        start: function( event, ui){
+                            ui.item.data('item_order', ui.item.index());
+                        },
+                        stop: function( event, ui ){
+                            var start = ui.item.data('item_order');
+                            if ( start != ui.item.index()){
+                                console.log('moved');
+                            } else {
+                                console.log('not moved');
+                            }
+
+                        },
+                        update: function( event, ui ){
+                            console.log('updating');
+                        }
                     });
                     $('.pc_quick_menu_item_position').disableSelection();
                 } // yup
