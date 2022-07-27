@@ -6,12 +6,36 @@ jQuery(document).ready(function($) {
     var spinner = $(menuPositionSelect).find('.spinner');
 
     // if there is already a selected item i need to get the menu items
+    $(menuSelect).children('option').each( function() {
+        if (this.selected){
+            var selectedMenu = $(this).val();
+            var currentPostID = $('#post_ID').val();
 
-    // detecting menu select
+            pcq_process_select( selectedMenu, currentPostID, spinner );
+        }
+    });
+
+    // detecting menu select change when we have a new item for a menu
     $(menuSelect).on('change', function(){
         var selectedMenu = $(this).val();
         var currentPostID = $('#post_ID').val();
 
+        pcq_process_select( selectedMenu, currentPostID, spinner );
+               // return the menu items to the page
+        //  - make sure you clear the area so that you can put in new menu items
+        // make sure we append the current page to the menu (should probably save the menu right away as well)
+    });
+
+    /**
+     * Abstracts the processing of the menu items showing in the metabox so that we have them
+     *
+     * @since 1.2
+     *
+     * @param {int} selectedMenu ID of the selected menu
+     * @param {int} currentPostID ID of the current post
+     * @param {*} spinner
+     */
+    function pcq_process_select( selectedMenu, currentPostID, spinner ){
         // showing spinner
         $(spinner).css('visibility', 'visible' );
 
@@ -63,10 +87,8 @@ jQuery(document).ready(function($) {
 
             }); // end ajax post
 
-        // return the menu items to the page
-        //  - make sure you clear the area so that you can put in new menu items
-        // make sure we append the current page to the menu (should probably save the menu right away as well)
-    });
+
+    }
 
     // @todo detect drag/drop change in menu order and save
 
