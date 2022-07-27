@@ -5,12 +5,12 @@ jQuery(document).ready(function($) {
     var menuPositionSelect = $(menuWrapper).find('.pc_quick_menu_position');
     var spinner = $(menuPositionSelect).find('.spinner');
 
+    // if there is already a selected item i need to get the menu items
+
     // detecting menu select
     $(menuSelect).on('change', function(){
         var selectedMenu = $(this).val();
         var currentPostID = $('#post_ID').val();
-
-        console.log( currentPostID );
 
         // showing spinner
         $(spinner).css('visibility', 'visible' );
