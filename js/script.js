@@ -21,9 +21,7 @@ jQuery(document).ready(function($) {
         var currentPostID = $('#post_ID').val();
 
         pcq_process_select( selectedMenu, currentPostID, spinner );
-               // return the menu items to the page
-        //  - make sure you clear the area so that you can put in new menu items
-        // make sure we append the current page to the menu (should probably save the menu right away as well)
+        // @todo handle nested item
     });
 
     /**
