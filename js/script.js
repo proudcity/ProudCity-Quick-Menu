@@ -29,7 +29,10 @@ jQuery(document).ready(function($) {
 
                 if ( true === response.data.success ){
                     $(menuPositionSelect).empty().append( response.data.value );
-                    $('.pc_quick_menu_item_position').sortable();
+                    $('.pc_quick_menu_item_position').sortable({
+                        placeholder: "pc-quick-drop-target"
+                    });
+                    $('.pc_quick_menu_item_position').disableSelection();
                 } // yup
 
                 if ( false === response.data.success ){

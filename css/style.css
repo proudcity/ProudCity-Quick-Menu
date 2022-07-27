@@ -40,6 +40,12 @@
     cursor:grab;
 }
 
+.pc-quick-drop-target{
+    background-color:#ccc;
+    height:2em;
+    line-height:1em;
+}
+
 .pc_quick_menu_item.current-menu-item{
     background:#0071bc;
     color:white;
