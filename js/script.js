@@ -73,7 +73,7 @@ jQuery(document).ready(function($) {
                         },
                         update: function( event, ui ){
                             $(this).children('li').each(function(index){
-                               $(this).attr('data-item_order', index);
+                               $(this).attr('data-menu-item-position', index);
                                // need to save the new order of items
                                // need the menu_id
                                // need to have an array of data for each item similar to the `$values` array where data-item_order is `menu-item-position` in the array

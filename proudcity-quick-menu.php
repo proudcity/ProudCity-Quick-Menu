@@ -59,6 +59,8 @@ if (!class_exists('WP_Quick_Menu')) {
                 absint( $_POST['selected_menu'] )
             );
 
+            //print_r( $menu_items );
+
             // @todo if empty handling
             // @todo deal with child items in a menu as well
 
@@ -67,8 +69,25 @@ if (!class_exists('WP_Quick_Menu')) {
             $html .= '<ul class="pc_quick_menu_item_position">';
                 foreach( $menu_items as $item ){
                     $current_item = absint( $item->object_id ) == absint( $_POST['current_post_id'] ) ? 'current-menu-item' : '';
+                    $child_depth = self::is_item_a_child_item( $item ) ? 'item-depth-1' : '';
                     $in_menu = self::is_item_already_in_menu( $in_menu, absint( $item->object_id ), absint( $_POST['current_post_id'] ) );
-                    $html .= '<li class="pc_quick_menu_item ' . sanitize_html_class( $current_item ) .'" data-post_id="'. absint( $item->object_id ) .'" data-item_order="'. $count .'">'. esc_attr( $item->title ) .'</li>';
+                    $html .= '<li ';
+                        $html .= 'class="pc_quick_menu_item ' . sanitize_html_class( $current_item ) .' '. sanitize_html_class( $child_depth ) .'" ';
+                        $html .= 'data-menu-item-db-id="'. absint( $item->db_id ) .'" ';
+                        $html .= 'data-menu-item-object_id="'. absint( $item->object_id ) .'" ';
+                        $html .= 'data-menu-item-object="'. esc_attr( $item->page ) .'" ';
+                        $html .= 'data-menu-item-parent-id="'. absint( $item->menu_item_parent ) .'" ';
+                        $html .= 'data-menu-item-type="'. esc_attr( $item->type ) .'" ';
+                        $html .= 'data-menu-item-title="'. esc_attr( $item->title ) .'" ';
+                        $html .= 'data-menu-item-url="'. esc_url( $item->url ) .'" ';
+                        $html .= 'data-menu-item-description="'. esc_attr( $item->description ) .'" ';
+                        $html .= 'data-menu-item-attr-title="' . esc_attr( $item->attr_title ) .'" ';
+                        $html .= 'data-menu-item-target="'. esc_attr( $item->target ) .'" ';
+                        $html .= 'data-menu-item-classes="'. self::sanitize_array_of_css_classes( $item->classes ) .'" ';
+                        $html .= 'data-menu-item-xfn="'. esc_attr( $item->xfn ) .'" ';
+                        $html .= 'data-menu-item-position="'. $count .'">';
+                        $html .= esc_attr( $item->title );
+                    $html .= '</li>';
                     $count++;
                 }
 
@@ -89,6 +108,33 @@ if (!class_exists('WP_Quick_Menu')) {
             wp_send_json_success( $data );
 
         } // get_menu_items
+
+        /**
+         * Loops through and sanitizes the array of CSS classes on the item
+         */
+        private static function sanitize_array_of_css_classes( $class_array ){
+
+            $sanitized_classes = '';
+
+            foreach( $class_array as $key => $value ){
+                $sanitized_classes .= sanitize_html_class( $value ) . ' ';
+            }
+
+            return (string) $sanitized_classes;
+        }
+
+        /**
+         * Returns true if this is a child item
+         */
+        private static function is_item_a_child_item( $item ){
+
+            $is_child = false;
+            if ( isset( $item->menu_item_parent ) && 0 != absint( $item->menu_item_parent ) ){
+                $is_child = true;
+            }
+
+            return (bool) $is_child;
+        }
 
         /**
          * Returns true if the item is already in the menu
