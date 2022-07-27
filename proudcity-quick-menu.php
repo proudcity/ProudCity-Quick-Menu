@@ -200,7 +200,7 @@ if (!class_exists('WP_Quick_Menu')) {
                     </div>
 
                     <select id="wp_quick_nav_menu" name="wp_quick_nav_menu">
-                        <option value=""><?php echo __( '- No Menu- ', 'wp_quick_menu' ); ?></option>
+                        <option value=""><?php echo __( '- No Menu - ', 'wp_quick_menu' ); ?></option>
                         <?php echo self::pc_quick_menu_return_menu_options( $nav_menus ); ?>
                     </select>
                 </p>
@@ -218,14 +218,17 @@ if (!class_exists('WP_Quick_Menu')) {
          * Builds the options for our nav menus
          *
          * @since 1.2
+         *
+         * @param   array       $nav_menus      required                Array of nav menu locations
+         * @uses    self::is_item_selected()                            Returns selected text if current page is in the menu
          */
         private static function pc_quick_menu_return_menu_options( $nav_menus ){
 
             $html = '';
 
             foreach( $nav_menus as $nav_menu ){
-                // @todo deal with selected state
-                $html .= '<option value="'. absint( $nav_menu->term_id ) .'">';
+                $selected = self::is_item_selected( absint( $nav_menu->term_id ), absint( $_GET['post'] ) );
+                $html .= '<option value="'. absint( $nav_menu->term_id ) .'" '. $selected .'>';
                     $html .= esc_attr( $nav_menu->name );
                 $html .= '</option>';
             }
@@ -233,6 +236,32 @@ if (!class_exists('WP_Quick_Menu')) {
             return $html;
 
         } // pc_quick_return_menu_options
+
+        /**
+         * Returns selected text if the item is selected
+         *
+         * @since 1.2
+         *
+         * @param   $menu_id        int         required            wp nav menu id
+         * @param   $post_id        int         required            the id for the post we're checking
+         * @uses    wp_get_nav_menu_items()                         Returns the items in the nav menu
+         * @return  string                                          empty if no match selected if a match is found
+         */
+        private static function is_item_selected( $menu_id, $post_id ){
+
+            $selected = '';
+
+            $menu_items = wp_get_nav_menu_items( absint( $menu_id ) );
+
+            foreach( $menu_items as $item ){
+                if ( $post_id == $item->object_id ){
+                    return 'selected';
+                }
+            } // foreach
+
+            return $selected;
+
+        } // is_item_selected
 
         /**
          * Returns the possible menu order positions for a menu.
