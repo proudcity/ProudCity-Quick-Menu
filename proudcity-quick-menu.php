@@ -62,12 +62,20 @@ if (!class_exists('WP_Quick_Menu')) {
             // @todo if empty handling
             // @todo deal with child items in a menu as well
 
+            $in_menu = false;
+
             $html .= '<ul class="pc_quick_menu_item_position">';
                 foreach( $menu_items as $item ){
-                    $html .= '<li class="pc_quick_menu_item" data-post_id="'. absint( $item->ID ) .'" data-item_order="'. $count .'">'. esc_attr( $item->title ) .'</li>';
+                    $current_item = absint( $item->object_id ) == absint( $_POST['current_post_id'] ) ? 'current-menu-item' : '';
+                    $in_menu = self::is_item_already_in_menu( $in_menu, absint( $item->object_id ), absint( $_POST['current_post_id'] ) );
+                    $html .= '<li class="pc_quick_menu_item ' . sanitize_html_class( $current_item ) .'" data-post_id="'. absint( $item->object_id ) .'" data-item_order="'. $count .'">'. esc_attr( $item->title ) .'</li>';
                     $count++;
                 }
-                $html .= self::get_current_item( absint( $_POST['current_post_id'] ), $count );
+
+                // false because we are adding our current item to a newly selected menu
+                if ( ! $in_menu ){
+                    $html .= self::get_current_item( absint( $_POST['current_post_id'] ), $count );
+                }
             $html .= '</ul>';
 
             $success = true;
@@ -79,10 +87,36 @@ if (!class_exists('WP_Quick_Menu')) {
             );
 
             wp_send_json_success( $data );
-        } // get_sku
+
+        } // get_menu_items
+
+        /**
+         * Returns true if the item is already in the menu
+         *
+         * @since 1.2
+         *
+         * @param   bool        $in_menu            optional                True if the item is in the menu
+         * @param   int         $menu_object_id     required                object id of the menu item
+         * @param   int         $current_post_id    required                ID for the current post
+         * @return  bool                                                    true if the item is already in the menu
+         */
+        private static function is_item_already_in_menu( $in_menu = false, $menu_object_id, $current_post_id ){
+
+            if ( true == $in_menu ) return (bool) $in_menu;
+
+            if ( absint( $menu_object_id ) == absint( $current_post_id ) ){
+                $in_menu = true;
+            }
+
+            return (bool) $in_menu;
+        }
 
         /**
          * Retrieves the HTML for the current item
+         *
+         * @since 1.2
+         *
+         * @uses    int         $post_id        required                    The id of the current item
          */
         public static function get_current_item( $post_id, $order ){
 
