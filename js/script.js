@@ -37,6 +37,7 @@ jQuery(document).ready(function($) {
         // showing spinner
         $(spinner).css('visibility', 'visible' );
 
+        // compile the data for our ajax call
         var data = {
             'action': 'pc_quick_get_menu_items',
             'selected_menu': selectedMenu,
@@ -50,7 +51,10 @@ jQuery(document).ready(function($) {
                 $(spinner).css('visibility', 'hidden' );
 
                 if ( true === response.data.success ){
+                    // adding our menu items
                     $(menuPositionSelect).empty().append( response.data.value );
+
+                    // making our menu items sortable
                     $('.pc_quick_menu_item_position').sortable({
                         placeholder: "pc-quick-drop-target",
                         start: function( event, ui){
