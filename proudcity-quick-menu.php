@@ -74,7 +74,7 @@ if (!class_exists('WP_Quick_Menu')) {
                     $html .= '<li ';
                         $html .= 'class="pc_quick_menu_item ' . sanitize_html_class( $current_item ) .' '. sanitize_html_class( $child_depth ) .'" ';
                         $html .= 'data-menu-item-db-id="'. absint( $item->db_id ) .'" ';
-                        $html .= 'data-menu-item-object_id="'. absint( $item->object_id ) .'" ';
+                        $html .= 'data-menu-item-object-id="'. absint( $item->object_id ) .'" ';
                         $html .= 'data-menu-item-object="'. esc_attr( $item->page ) .'" ';
                         $html .= 'data-menu-item-parent-id="'. absint( $item->menu_item_parent ) .'" ';
                         $html .= 'data-menu-item-type="'. esc_attr( $item->type ) .'" ';

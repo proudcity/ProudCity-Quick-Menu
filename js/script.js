@@ -72,12 +72,47 @@ jQuery(document).ready(function($) {
 
                         },
                         update: function( event, ui ){
+                            var updatedItems = [];
                             $(this).children('li').each(function(index){
                                $(this).attr('data-menu-item-position', index);
+
+                               var menuItemDbId = $(this).data('menu-item-db-id');
+                               var menuItemObjectId = $(this).data('menu-item-object-id');
+                               var menuItemObject = $(this).data('menu-item-object');
+                               var menuItemParentId = $(this).data('menu-item-parent-id');
+                               var menuItemType = $(this).data('menu-item-type');
+                               var menuItemTitle = $(this).data('menu-item-title');
+                               var menuItemUrl = $(this).data('menu-item-url');
+                               var menuItemDescription = $(this).data('menu-item-description');
+                               var menuItemAttrTitle = $(this).data('menu-item-attr-title');
+                               var menuItemTarget = $(this).data('menu-item-target');
+                               var menuItemClasses = $(this).data('menu-item-classes');
+                               var menuItemXfn = $(this).data('menu-item-xfn');
+                               var menuItemPosition = $(this).data('menu-item-position');
+
+                               updatedItems.push({
+                                'menu-item-db-id': menuItemDbId,
+                                'menu-item-object-id': menuItemObjectId,
+                                'menu-item-object': menuItemObject,
+                                'menu-item-parent-id': menuItemParentId,
+                                'menu-item-type': menuItemType,
+                                'menu-item-title': menuItemTitle,
+                                'menu-item-url': menuItemUrl,
+                                'menu-item-description': menuItemDescription,
+                                'menu-item-attr-title': menuItemAttrTitle,
+                                'menu-item-target': menuItemTarget,
+                                'menu-item-classes': menuItemClasses,
+                                'menu-item-xfn': menuItemXfn,
+                                'menu-item-position': menuItemPosition
+                               });
+
                                // need to save the new order of items
                                // need the menu_id
                                // need to have an array of data for each item similar to the `$values` array where data-item_order is `menu-item-position` in the array
                             });
+
+                            // after we've looped through the items we need to do the ajax thing to update them
+                               console.log( updatedItems );
                         }
                     });
                     $('.pc_quick_menu_item_position').disableSelection();
