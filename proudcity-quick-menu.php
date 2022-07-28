@@ -42,19 +42,36 @@ if (!class_exists('WP_Quick_Menu')) {
         function __construct() {
             add_action('admin_enqueue_scripts', array($this, 'wp_quick_menu_add_css_js'));
             add_action('add_meta_boxes', array($this, 'wp_quick_menu_add_meta_box'));
-            add_action('save_post', array($this, 'wp_quick_menu_save_meta_box_data'));
+//            add_action('save_post', array($this, 'wp_quick_menu_save_meta_box_data'));
 
             add_action( 'wp_ajax_pc_quick_get_menu_items', array( $this, 'get_menu_items' ) );
             add_action( 'wp_ajax_pcq_update_menu', array( $this, 'update_menu_items' ) );
         }
 
+        /**
+         * Updates the menu items when we change their order
+         *
+         * @since 1.2
+         *
+         * @param   int         $menu_to_update         optional            The ID of the menu to update
+         * @param   array       $updated_items          optional            Array of menu items with their data
+         */
         public static function update_menu_items( $menu_to_update = '', $updated_items = '' ){
             check_ajax_referer( 'pc_quick_menu_nonce', 'security' );
 
             $menu_to_update = absint( $_POST['menu-to-update'] );
 
-            $success = false;
-            $message = 'not updated';
+            foreach( $_POST['menu-items'] as $item ){
+            $saved = wp_update_nav_menu_item( absint( $menu_to_update ), $item['menu-item-db-id'], $item );
+            }
+
+            if ( ! empty( $saved ) ){
+                $success = true;
+                $message = 'Menu Updated';
+            } else {
+                $success = false;
+                $message = 'not updated';
+            }
 
             $data = array(
                 'success' => (bool) $success,

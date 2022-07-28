@@ -8,14 +8,11 @@ jQuery(document).ready(function($) {
     var userMessage = $(userFeedback).find('#pcq_feedback_message');
 
     // if there is already a selected item i need to get the menu items
-    $(menuSelect).children('option').each( function() {
-        if (this.selected){
-            var selectedMenu = $(this).val();
-            var currentPostID = $('#post_ID').val();
-
-            pcq_process_select( selectedMenu, currentPostID, spinner );
-        }
-    });
+    var selectedMenu = $(menuSelect).find('option:selected').val()
+    if ( selectedMenu.length ){
+        var currentPostID = $('#post_ID').val();
+        pcq_process_select( selectedMenu, currentPostID, spinner );
+    }
 
     // detecting menu select change when we have a new item for a menu
     $(menuSelect).on('change', function(){
@@ -23,7 +20,6 @@ jQuery(document).ready(function($) {
         var currentPostID = $('#post_ID').val();
 
         pcq_process_select( selectedMenu, currentPostID, spinner );
-        // @todo handle nested item
     });
 
     /**
@@ -151,10 +147,9 @@ jQuery(document).ready(function($) {
 
         $.post( PCQuickMenuScripts.ajaxurl, data, function( response ) {
 
-                // @todo hide spinner
-
+                $(spinner).css('visibility', 'hidden' );
                 if ( true === response.data.success ){
-                    console.log( 'succes' );
+                    console.log( 'success' );
                 } // yup
 
                 if ( false === response.data.success ){
