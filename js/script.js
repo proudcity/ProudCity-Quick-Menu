@@ -3,7 +3,9 @@ jQuery(document).ready(function($) {
     var menuWrapper = $('.inside.pc_quick_menu_wrapper');
     var menuSelect = $(menuWrapper).find('select#wp_quick_nav_menu');
     var menuPositionSelect = $(menuWrapper).find('.pc_quick_menu_position');
-    var spinner = $(menuPositionSelect).find('.spinner');
+    var userFeedback = $('#pcq_user_feedback');
+    var spinner = $(userFeedback).find('.spinner');
+    var userMessage = $(userFeedback).find('#pcq_feedback_message');
 
     // if there is already a selected item i need to get the menu items
     $(menuSelect).children('option').each( function() {
@@ -72,8 +74,14 @@ jQuery(document).ready(function($) {
 
                         },
                         update: function( event, ui ){
+                            // get menu being update
+                            var menuToUpdate = $(menuSelect).find(':selected').val();
+
+                            // build array of menu items for saving
                             var updatedItems = [];
                             $(this).children('li').each(function(index){
+
+                                //first we need to update the position index
                                $(this).attr('data-menu-item-position', index);
 
                                var menuItemDbId = $(this).data('menu-item-db-id');
@@ -106,13 +114,11 @@ jQuery(document).ready(function($) {
                                 'menu-item-position': menuItemPosition
                                });
 
-                               // need to save the new order of items
-                               // need the menu_id
-                               // need to have an array of data for each item similar to the `$values` array where data-item_order is `menu-item-position` in the array
                             });
 
                             // after we've looped through the items we need to do the ajax thing to update them
-                               console.log( updatedItems );
+                            pcq_save_updated_menu_items( menuToUpdate, updatedItems, spinner );
+
                         }
                     });
                     $('.pc_quick_menu_item_position').disableSelection();
@@ -127,7 +133,40 @@ jQuery(document).ready(function($) {
 
     }
 
-    // @todo detect drag/drop change in menu order and save
+    /**
+     *
+     * @param {int}     menuToUpdate    required            ID of the menu we need to update
+     * @param {array}   updatedItems    required            nested array of the menu items we need to update via `wp_save_nav_menu`
+     */
+    function pcq_save_updated_menu_items( menuToUpdate, updatedItems, spinner ){
+
+        $(spinner).css('visibility', 'visible');
+
+        var data = {
+            'action': 'pcq_update_menu',
+            'menu-to-update': menuToUpdate,
+            'menu-items': updatedItems,
+            'security': PCQuickMenuScripts.pc_quick_menu_nonce
+        }
+
+        $.post( PCQuickMenuScripts.ajaxurl, data, function( response ) {
+
+                // @todo hide spinner
+
+                if ( true === response.data.success ){
+                    console.log( 'succes' );
+                } // yup
+
+                if ( false === response.data.success ){
+                    console.log( 'fail' );
+                }
+
+            }); // end ajax post
+
+        // build the data array for ajax
+        // give the user some feedback that the menu items have been updated
+
+    } // pcq_save_updated_menu_items
 
 
 });

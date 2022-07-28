@@ -45,6 +45,23 @@ if (!class_exists('WP_Quick_Menu')) {
             add_action('save_post', array($this, 'wp_quick_menu_save_meta_box_data'));
 
             add_action( 'wp_ajax_pc_quick_get_menu_items', array( $this, 'get_menu_items' ) );
+            add_action( 'wp_ajax_pcq_update_menu', array( $this, 'update_menu_items' ) );
+        }
+
+        public static function update_menu_items( $menu_to_update = '', $updated_items = '' ){
+            check_ajax_referer( 'pc_quick_menu_nonce', 'security' );
+
+            $menu_to_update = absint( $_POST['menu-to-update'] );
+
+            $success = false;
+            $message = 'not updated';
+
+            $data = array(
+                'success' => (bool) $success,
+                'message' => $message,
+            );
+
+            wp_send_json_success( $data );
         }
 
         /**
@@ -286,6 +303,10 @@ if (!class_exists('WP_Quick_Menu')) {
                 </p>
 
                 <div class="pc_quick_menu_position">
+                </div>
+
+                <div id="pcq_user_feedback">
+                    <p id="pcq_feedback_message"></p>
                     <span class="spinner"></span>
                 </div>
 

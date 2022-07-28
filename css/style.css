@@ -55,6 +55,10 @@
     margin-left:20px;
 }
 
+#pcq_user_feedback{
+    overflow:hidden;
+}
+
 #wp_quick_menu_meta_box .inside .accordion-section-title{
     border-left: none;
     border-right: none;
