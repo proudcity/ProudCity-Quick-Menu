@@ -121,13 +121,42 @@ if (!class_exists('WP_Quick_Menu')) {
                         $html .= 'data-menu-item-xfn="'. esc_attr( $item->xfn ) .'" ';
                         $html .= 'data-menu-item-position="'. $count .'">';
                         $html .= esc_attr( $item->title );
+                        $html .= '<span class="pcq_delete_item">X</span>';
                     $html .= '</li>';
                     $count++;
                 }
 
                 // false because we are adding our current item to a newly selected menu
                 if ( ! $in_menu ){
-                    $html .= self::get_current_item( absint( $_POST['current_post_id'] ), $count );
+
+                    $html .= self::get_current_item( absint( $_POST['current_post_id'] ), absint( $count ) );
+
+                    $post_id = $_POST['current_post_id'];
+
+                    $post_args = array(
+                        'ID' => 0,
+                        'post_title' => get_the_title( absint( $post_id ) ),
+                        'post_type' => 'nave_menu_item',
+                        'post_status' => 'publish',
+                        'menu_order' => absint( $count ),
+                        'post_content' => '',
+                    );
+
+                    $nav_menu_item = wp_insert_post( $post_args );
+
+                    update_option( 'sfn_test', 'nav_id ' . $nav_menu_item );
+
+                    wp_set_object_terms( absint( $nav_menu_item ), absint( $_POST['selected_menu'] ), 'nav_menu', false );
+
+                    update_post_meta( absint( $nav_menu_item ), '_menu_item_url', esc_url( get_the_permalink( absint( $post_id ) ) ) );
+                    update_post_meta( absint( $nav_menu_item ), '_menu_item_target', '_blank' );
+                    update_post_meta( absint( $nav_menu_item ), '_menu_item_classes', array() );
+                    update_post_meta( absint( $nav_menu_item ), '_menu_item_xfn', '' );
+                    update_post_meta( absint( $nav_menu_item ), '_menu_item_object_id', absint( $post_id ) );
+                    update_post_meta( absint( $nav_menu_item ), '_menu_item_object', get_post_type( absint( $post_id ) ) );
+                    update_post_meta( absint( $nav_menu_item ), '_menu_item_type', 'post_type' );
+
+
                 }
             $html .= '</ul>';
 
@@ -204,7 +233,12 @@ if (!class_exists('WP_Quick_Menu')) {
 
             $title = empty( get_post_field( 'title', absint( $post_id ) ) ) ? get_post_field( 'post_title', absint( $post_id ) ) : get_post_field( 'title', absint( $post_id ) );
 
-            $html .= '<li class="pc_quick_menu_item current-menu-item" data-post_id="'. absint( $post_id ) .'" data-item_order="'. absint( $order ) .'">'. esc_attr( $title ) .'</li>';
+            $html .= '<li class="pc_quick_menu_item current-menu-item" ';
+                $html .= 'data-post_id="'. absint( $post_id ) .'" ';
+                $html .= 'data-item_order="'. absint( $order ) .'">';
+                $html .= esc_attr( $title );
+                $html .= '<span title="Delete Item" class="pcq_delete_item">X</span>';
+            $html .= '</li>';
 
             return $html;
 
@@ -214,14 +248,21 @@ if (!class_exists('WP_Quick_Menu')) {
          * add required JS and CSS
          */
         function wp_quick_menu_add_css_js() {
-            wp_enqueue_style('wp_quick_menu_style', plugins_url('css/style.css', __FILE__));
 
-            // scripts plugin
-            wp_enqueue_script('pc_quick_menu_scripts', plugins_url( '/proudcity-quick-menu/js/script.js' ), array('jquery'), '1.2', true);
-            wp_localize_script( 'pc_quick_menu_scripts', 'PCQuickMenuScripts', array(
-                'ajaxurl'           => admin_url( 'admin-ajax.php' ),
-                'pc_quick_menu_nonce' => wp_create_nonce( 'pc_quick_menu_nonce' ),
-            ) );
+            $allowed_post_types = apply_filters( 'pcq_allowed_post_types', array( 'post', 'page' ) );
+            $screen = get_current_screen();
+
+            // only adding our scripts on specific types that are allowed
+            if ( in_array( $screen->id, $allowed_post_types ) ){
+                wp_enqueue_style('wp_quick_menu_style', plugins_url('css/style.css', __FILE__));
+
+                // scripts plugin
+                wp_enqueue_script('pc_quick_menu_scripts', plugins_url( '/proudcity-quick-menu/js/script.js' ), array('jquery'), '1.2', true);
+                wp_localize_script( 'pc_quick_menu_scripts', 'PCQuickMenuScripts', array(
+                    'ajaxurl'           => admin_url( 'admin-ajax.php' ),
+                    'pc_quick_menu_nonce' => wp_create_nonce( 'pc_quick_menu_nonce' ),
+                ) );
+            }
         }
 
         /**

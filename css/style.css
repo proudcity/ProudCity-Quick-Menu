@@ -40,6 +40,19 @@
     cursor:grab;
 }
 
+.pcq_delete_item{
+    float:right;
+    font-size:.7em;
+    border:1px solid #CCC;
+    border-radius:3px;
+    padding:2px 5px;
+}
+
+.pcq_delete_item:hover{
+    box-shadow:1px 1px 1px #CCC;
+    cursor:pointer;
+}
+
 .pc-quick-drop-target{
     background-color:#ccc;
     height:2em;
@@ -49,6 +62,10 @@
 .pc_quick_menu_item.current-menu-item{
     background:#0071bc;
     color:white;
+}
+
+.pc_quick_menu_item.current-menu-item .pcq_delete_item{
+    border-color:white;
 }
 
 .pc_quick_menu_item.item-depth-1{
