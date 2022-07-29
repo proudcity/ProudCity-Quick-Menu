@@ -121,15 +121,13 @@ if (!class_exists('WP_Quick_Menu')) {
                         $html .= 'data-menu-item-xfn="'. esc_attr( $item->xfn ) .'" ';
                         $html .= 'data-menu-item-position="'. $count .'">';
                         $html .= esc_attr( $item->title );
-                        $html .= '<span class="pcq_delete_item">X</span>';
+                        $html .= '<span title="Delete Item" class="pcq_delete_item">X</span>';
                     $html .= '</li>';
                     $count++;
                 }
 
                 // false because we are adding our current item to a newly selected menu
                 if ( ! $in_menu ){
-
-                    $html .= self::get_current_item( absint( $_POST['current_post_id'] ), absint( $count ) );
 
                     $post_id = $_POST['current_post_id'];
 
@@ -157,6 +155,7 @@ if (!class_exists('WP_Quick_Menu')) {
                     update_post_meta( absint( $nav_menu_item ), '_menu_item_type', 'post_type' );
 
 
+                    $html .= self::get_current_item( absint( $_POST['current_post_id'] ), absint( $count ), absint( $nav_menu_item ) );
                 }
             $html .= '</ul>';
 
@@ -225,16 +224,19 @@ if (!class_exists('WP_Quick_Menu')) {
          *
          * @since 1.2
          *
-         * @uses    int         $post_id        required                    The id of the current item
+         * @uses    int         $post_id        required                    The id of the current item that our nav menu item links to
+         * @uses    int         $order          required                    The menu order of the item currently
+         * @uses    int         $db_id          required                    ID of the time in the database (because nav menu items are their own posts)
          */
-        public static function get_current_item( $post_id, $order ){
+        public static function get_current_item( $post_id, $order, $db_id ){
 
             $html = '';
 
             $title = empty( get_post_field( 'title', absint( $post_id ) ) ) ? get_post_field( 'post_title', absint( $post_id ) ) : get_post_field( 'title', absint( $post_id ) );
 
             $html .= '<li class="pc_quick_menu_item current-menu-item" ';
-                $html .= 'data-post_id="'. absint( $post_id ) .'" ';
+                $html .= 'data-menu-item-object-id="'. absint( $post_id ) .'" ';
+                $html .= 'data-menu-item-db-id="' . absint( $db_id ) .'" ';
                 $html .= 'data-item_order="'. absint( $order ) .'">';
                 $html .= esc_attr( $title );
                 $html .= '<span title="Delete Item" class="pcq_delete_item">X</span>';
