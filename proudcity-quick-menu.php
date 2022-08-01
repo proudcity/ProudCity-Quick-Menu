@@ -179,7 +179,7 @@ if (!class_exists('WP_Quick_Menu')) {
                     $post_args = array(
                         'ID' => 0,
                         'post_title' => get_the_title( absint( $post_id ) ),
-                        'post_type' => 'nave_menu_item',
+                        'post_type' => 'nav_menu_item',
                         'post_status' => 'publish',
                         'menu_order' => absint( $count ),
                         'post_content' => '',
