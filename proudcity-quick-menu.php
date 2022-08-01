@@ -44,8 +44,36 @@ if (!class_exists('WP_Quick_Menu')) {
             add_action('add_meta_boxes', array($this, 'wp_quick_menu_add_meta_box'));
 //            add_action('save_post', array($this, 'wp_quick_menu_save_meta_box_data'));
 
+            // ajax actions
             add_action( 'wp_ajax_pc_quick_get_menu_items', array( $this, 'get_menu_items' ) );
             add_action( 'wp_ajax_pcq_update_menu', array( $this, 'update_menu_items' ) );
+            add_action( 'wp_ajax_pcq_delete_menu_item', array( $this, 'delete_menu_item' ) );
+
+        }
+
+        public static function delete_menu_item(){
+
+            check_ajax_referer( 'pc_quick_menu_nonce', 'security' );
+
+            $post_id = $_POST['post_id'];
+
+            $success = false;
+            $message = 'The menu item was NOT deleted. Please contact a site administrator.';
+
+            $deleted = wp_delete_post( absint( $post_id ), true );
+
+            if ( false !== $deleted || null !== $deleted ){
+                $success = true;
+                $message = 'Menu item was removed.';
+            }
+
+            $data = array(
+                'success' => (bool) $success,
+                'message' => $message,
+            );
+
+            wp_send_json_success( $data );
+
         }
 
         /**
