@@ -57,20 +57,32 @@ if (!class_exists('WP_Quick_Menu')) {
          * @param   array       $updated_items          optional            Array of menu items with their data
          */
         public static function update_menu_items( $menu_to_update = '', $updated_items = '' ){
+
             check_ajax_referer( 'pc_quick_menu_nonce', 'security' );
 
-            $menu_to_update = absint( $_POST['menu-to-update'] );
+            $updated = array();
 
             foreach( $_POST['menu-items'] as $item ){
-            $saved = wp_update_nav_menu_item( absint( $menu_to_update ), $item['menu-item-db-id'], $item );
-            }
+                $update_args = array(
+                    'ID' => absint( $item['menu-item-db-id'] ),
+                    'menu_order' => intval( $item['menu-item-position'] ),
+                    'post_excerpt' => 'nope',
+                );
+
+                $updated[] = wp_update_post( $update_args );
+
+                if ( ! in_array( WP_ERROR, $updated ) ){
+                    $saved = true;
+                }
+
+            } // foreach
 
             if ( ! empty( $saved ) ){
                 $success = true;
                 $message = 'Menu Updated';
             } else {
                 $success = false;
-                $message = 'not updated';
+                $message = 'Menu NOT Updated. Please contact a site administrator.';
             }
 
             $data = array(
@@ -83,6 +95,10 @@ if (!class_exists('WP_Quick_Menu')) {
 
         /**
          * Returns the items in a menu given the Menu ID
+         *
+         * @since 1.2
+         *
+         * @uses    wp_get_nav_menu_items()                         Returns the items in a menu
          */
         public function get_menu_items(){
             check_ajax_referer( 'pc_quick_menu_nonce', 'security' );
@@ -129,6 +145,7 @@ if (!class_exists('WP_Quick_Menu')) {
                 // false because we are adding our current item to a newly selected menu
                 if ( ! $in_menu ){
 
+                    // @todo abstract this to it's own function
                     $post_id = $_POST['current_post_id'];
 
                     $post_args = array(
@@ -158,6 +175,8 @@ if (!class_exists('WP_Quick_Menu')) {
                     $html .= self::get_current_item( absint( $_POST['current_post_id'] ), absint( $count ), absint( $nav_menu_item ) );
                 }
             $html .= '</ul>';
+
+            $html .= '<p class="pcq-edit-menu-link">For more detailed editing of your menu see - <a target="_blank" href="' . site_url() .'/wp-admin/nav-menus.php?action=edit&menu='. absint( $_POST['selected_menu'] ) .'">Advanced Menu Editing</a></p>';
 
             $success = true;
             $value = $html;

@@ -149,19 +149,17 @@ jQuery(document).ready(function($) {
 
                 $(spinner).css('visibility', 'hidden' );
                 if ( true === response.data.success ){
-                    console.log( 'success' );
+                    $('#pcq_feedback_message').empty().show().append(response.data.message).delay(1500).fadeOut();
                 } // yup
 
                 if ( false === response.data.success ){
-                    console.log( 'fail' );
+                    $('#pcq_feedback_message').empty().show().append(response.data.message).delay(1500).fadeOut();
                 }
 
             }); // end ajax post
 
-        // build the data array for ajax
-        // give the user some feedback that the menu items have been updated
-
     } // pcq_save_updated_menu_items
 
+    // @todo delete items from the menu
 
 });
