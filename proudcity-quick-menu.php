@@ -32,9 +32,9 @@ if (!defined('WPINC')) {
 
 require_once ABSPATH . 'wp-admin/includes/nav-menu.php';
 
-if (!class_exists('WP_Quick_Menu')) {
+if (!class_exists('PC_Quick_Menu')) {
 
-    class WP_Quick_Menu {
+    class PC_Quick_Menu {
 
         /**
          * class constructor
@@ -470,4 +470,4 @@ if (!class_exists('WP_Quick_Menu')) {
 
 }
 
-$wp_quick_menu = new WP_Quick_Menu();
+$pc_quick_menu = new PC_Quick_Menu();
