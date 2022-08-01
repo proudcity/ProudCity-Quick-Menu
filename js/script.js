@@ -160,6 +160,44 @@ jQuery(document).ready(function($) {
 
     } // pcq_save_updated_menu_items
 
-    // @todo delete items from the menu
+    $(menuWrapper).on('click touchstart', '.pcq_delete_item', function(){
 
+        // show spinner
+        $(spinner).css('visibility', 'visible' );
+
+        var parentItem = $(this).parent('.pc_quick_menu_item');
+        var postId = $(parentItem).data('menu-item-db-id');
+        var deletePostId = $(parentItem).data('menu-item-object-id');
+        var currentPostID = $('#post_ID').val();
+
+        var data = {
+            'action': 'pcq_delete_menu_item',
+            'post_id': postId,
+            'security': PCQuickMenuScripts.pc_quick_menu_nonce
+        }
+
+        $.post( PCQuickMenuScripts.ajaxurl, data, function( response ) {
+
+                // hide spinner
+                $(spinner).css( 'visibility', 'hidden' );
+
+                if ( true === response.data.success ){
+                    $('#pcq_feedback_message').empty().show().append(response.data.message).delay(1500).fadeOut();
+
+                    // if we are removing this item from the menu then we need to reset the menu
+                    if ( currentPostID == deletePostId ){
+                        $('.pc_quick_menu_position').fadeOut(500).delay(500).empty();
+                        $(menuSelect).prop('selectedIndex', 0 );
+                    } else {
+                        $(parentItem).fadeOut(500).delay(500).remove();
+                    }
+                    // reset the main menu select
+                } // yup
+
+                if ( false === response.data.success ){
+                    $('#pcq_feedback_message').empty().show().append(response.data.message).delay(1500).fadeOut();
+                }
+
+            }); // end ajax post
+    });
 });
