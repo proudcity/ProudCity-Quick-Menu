@@ -16,10 +16,12 @@ jQuery(document).ready(function($) {
 
     // detecting menu select change when we have a new item for a menu
     $(menuSelect).on('change', function(){
+
+        var oldMenu = $(menuWrapper).find('#old-menu').data('old-menu');
         var selectedMenu = $(this).val();
         var currentPostID = $('#post_ID').val();
 
-        pcq_process_select( selectedMenu, currentPostID, spinner );
+        pcq_process_select( selectedMenu, currentPostID, spinner, oldMenu );
     });
 
     /**
@@ -31,7 +33,7 @@ jQuery(document).ready(function($) {
      * @param {int} currentPostID ID of the current post
      * @param {*} spinner
      */
-    function pcq_process_select( selectedMenu, currentPostID, spinner ){
+    function pcq_process_select( selectedMenu, currentPostID, spinner, oldMenu = null ){
         // showing spinner
         $(spinner).css('visibility', 'visible' );
 
@@ -39,6 +41,7 @@ jQuery(document).ready(function($) {
         var data = {
             'action': 'pc_quick_get_menu_items',
             'selected_menu': selectedMenu,
+            'old_menu_item': oldMenu,
             'current_post_id': currentPostID,
             'security': PCQuickMenuScripts.pc_quick_menu_nonce
         }

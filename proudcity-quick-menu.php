@@ -156,11 +156,18 @@ if (!class_exists('PC_Quick_Menu')) {
 
             $in_menu = false;
 
+            // if we changed a menu then this will delete the old item entry in the menu
+            self::maybe_remove_old_menu_entry( $_POST['old_menu_item'] );
+
             $html .= '<ul class="pc_quick_menu_item_position">';
                 foreach( $menu_items as $item ){
                     $current_item = absint( $item->object_id ) == absint( $_POST['current_post_id'] ) ? 'current-menu-item' : '';
                     $child_depth = self::is_item_a_child_item( $item ) ? 'item-depth-1' : '';
                     $in_menu = self::is_item_already_in_menu( $in_menu, absint( $item->object_id ), absint( $_POST['current_post_id'] ) );
+
+                    // sets the id of the nav menu item so we can use it to delete the item if we change menus
+                    $nav_menu_item = ( true === $in_menu ) ? absint( $item->db_id ) : '';
+
                     $html .= '<li ';
                         $html .= 'class="pc_quick_menu_item ' . sanitize_html_class( $current_item ) .' '. sanitize_html_class( $child_depth ) .'" ';
                         $html .= 'data-menu-item-db-id="'. absint( $item->db_id ) .'" ';
@@ -199,8 +206,6 @@ if (!class_exists('PC_Quick_Menu')) {
 
                     $nav_menu_item = wp_insert_post( $post_args );
 
-                    update_option( 'sfn_test', 'nav_id ' . $nav_menu_item );
-
                     wp_set_object_terms( absint( $nav_menu_item ), absint( $_POST['selected_menu'] ), 'nav_menu', false );
 
                     update_post_meta( absint( $nav_menu_item ), '_menu_item_url', esc_url( get_the_permalink( absint( $post_id ) ) ) );
@@ -216,6 +221,9 @@ if (!class_exists('PC_Quick_Menu')) {
                 }
             $html .= '</ul>';
 
+            // used to tell what the db-id of the item is in case we change the menu so we can delete it from the old one
+            $html .= '<div id="old-menu" data-old-menu="'. absint( $nav_menu_item ) .'"></div>';
+
             $html .= '<p class="pcq-edit-menu-link">For more detailed editing of your menu see - <a target="_blank" href="' . site_url() .'/wp-admin/nav-menus.php?action=edit&menu='. absint( $_POST['selected_menu'] ) .'">Advanced Menu Editing</a></p>';
 
             $success = true;
@@ -229,6 +237,22 @@ if (!class_exists('PC_Quick_Menu')) {
             wp_send_json_success( $data );
 
         } // get_menu_items
+
+        /**
+         * Removes the menu entry because we changed which menu the page was in
+         *
+         * @since 1.2
+         *
+         * @param   int         $old_menu_item_id           required                post_id of the old menu entry
+         * @uses    wp_delete_post()                                                deletes post given id or object
+         */
+        private static function maybe_remove_old_menu_entry( $old_menu_item_id ){
+
+            if ( null != $old_menu_item_id ){
+                wp_delete_post( $old_menu_item_id );
+            }
+
+        } // maybe_remove_old_menu_entry
 
         /**
          * Loops through and sanitizes the array of CSS classes on the item
