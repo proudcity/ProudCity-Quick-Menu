@@ -105,6 +105,10 @@
     padding:5px;
 }
 
+.pcq-edit-item-form .spinner{
+    margin-top:10px;
+}
+
 .pcq-menu-item-title{
     width:100%;
     clear:both;

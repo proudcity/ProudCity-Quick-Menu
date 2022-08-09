@@ -48,8 +48,39 @@ if (!class_exists('PC_Quick_Menu')) {
             add_action( 'wp_ajax_pc_quick_get_menu_items', array( $this, 'get_menu_items' ) );
             add_action( 'wp_ajax_pcq_update_menu', array( $this, 'update_menu_items' ) );
             add_action( 'wp_ajax_pcq_delete_menu_item', array( $this, 'delete_menu_item' ) );
+            add_action( 'wp_ajax_pcq_edit_menu_item', array( $this, 'edit_menu_item' ) );
 
         }
+
+        public static function edit_menu_item(){
+
+            check_ajax_referer( 'pc_quick_menu_nonce', 'security' );
+
+            $success = false;
+            $message = 'The menu item was NOT edited. Please contact a site administrator.';
+
+            $update_args = array(
+                'ID' => absint( $_POST['post_id'] ),
+                'post_title' => esc_attr( $_POST['item_title'] ),
+            );
+
+            $updated = wp_update_post( $update_args );
+
+
+            if ( ! is_wp_error( $updated ) ){
+                $success = true;
+                $message = 'Menu Item was updated';
+            }
+
+            $data = array(
+                'success' => (bool) $success,
+                'message' => $message,
+            );
+
+            wp_send_json_success( $data );
+
+
+        } // edit_menu_item
 
         /**
          * Deletes a menu item when the delete butten is pressed
@@ -190,7 +221,7 @@ if (!class_exists('PC_Quick_Menu')) {
                                 $html .= '<span title="Edit Item" class="pcq_edit_item dashicons dashicons-admin-tools"></span>';
                             $html .= '</div>';
                         $html .= '</div><!-- /.pcq-item-title-wrap -->';
-                        $html .= self::edit_item_form( absint( $item->object_id ), esc_attr( $item->title ) );
+                        $html .= self::edit_item_form( absint( $item->db_id ), $item );
                     $html .= '</li>';
                     $count++;
                 }
@@ -244,13 +275,26 @@ if (!class_exists('PC_Quick_Menu')) {
 
         } // get_menu_items
 
-        private static function edit_item_form( $post_id, $title ){
+        /**
+         * Displays our form to edit the item
+         *
+         * @since 1.2
+         * @author Curtis McHale
+         * @access private
+         *
+         * @param   int     $post_id        required            ID of the item we are editing
+         * @param   object  $item_object    required            Object containing item properties
+         * @return  string  $html                               built out HTML for the form
+         */
+        private static function edit_item_form( $post_id, $item_object ){
 
             $html = '';
 
             $html .= '<div class=pcq-edit-item-form>';
-                $html .= '<input class="pcq-menu-item-title" value="'. esc_attr( $title ).'" />';
-                $html .= '<button class="pcq-edit-item-button button" data-post_id="'. absint( $post_id ) .'">Update</button>';
+                $html .= '<label for="pcq-menu-item-title">Display Title</label>';
+                $html .= '<input class="pcq-menu-item-title" name="pcq-menu-item-title" value="'. esc_attr( $item_object->title ).'" />';
+                $html .= '<button class="pcq-edit-item-button button" data-menu-item-object-id="'. absint( $post_id ) .'">Update</button>';
+                $html .= '<span class="spinner pcq-edit-spinner"></span>';
             $html .= '</div>';
 
             return $html;

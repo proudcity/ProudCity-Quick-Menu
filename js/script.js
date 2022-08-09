@@ -204,10 +204,46 @@ jQuery(document).ready(function($) {
             }); // end ajax post
     });
 
-    $(menuWrapper).on('click touchstart', '.pcq_edit_item', function(){
-        var parentItem = $(this).parent('.pc_quick_menu_item');
-        var postId = $(parentItem).data('menu-item-db-id');
-        var deletePostId = $(parentItem).data('menu-item-object-id');
-        var currentPostID = $('#post_ID').val();
+    $(menuWrapper).on('click touchstart', '.pcq-edit-item-button', function(e){
+
+        e.preventDefault();
+
+        var parentItem = $(this).parent('.pcq-edit-item-form');
+        var editSpinner = $(parentItem).find('.spinner');
+        var editPostId = $(parentItem).find('.pcq-edit-item-button').data('menu-item-object-id');
+        var itemTitle = $(parentItem).find('.pcq-menu-item-title').val();
+        var editButton = $(this);
+
+        $(editSpinner).css('visibility', 'visible');
+
+        var data = {
+            'action': 'pcq_edit_menu_item',
+            'post_id': editPostId,
+            'item_title': itemTitle,
+            'security': PCQuickMenuScripts.pc_quick_menu_nonce
+        }
+
+        $.post( PCQuickMenuScripts.ajaxurl, data, function( response ) {
+
+                // hide spinner
+                $(editSpinner).css( 'visibility', 'hidden' );
+
+                if ( true === response.data.success ){
+                    $(editButton).html('Item Updated');
+                    $.wait( function(){
+                        $(editButton).html('Update');
+                    }, 3 );
+                } // yup
+
+                if ( false === response.data.success ){
+                    // false feedback
+                }
+
+            }); // end ajax post
     });
+
+    // gives me a more jQuery way to wait because that's what I feel comfortable with
+    $.wait = function( callback, seconds ){
+        return window.setTimeout( callback, seconds * 1000 );
+    }
 });
