@@ -203,4 +203,11 @@ jQuery(document).ready(function($) {
 
             }); // end ajax post
     });
+
+    $(menuWrapper).on('click touchstart', '.pcq_edit_item', function(){
+        var parentItem = $(this).parent('.pc_quick_menu_item');
+        var postId = $(parentItem).data('menu-item-db-id');
+        var deletePostId = $(parentItem).data('menu-item-object-id');
+        var currentPostID = $('#post_ID').val();
+    });
 });

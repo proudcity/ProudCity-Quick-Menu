@@ -183,8 +183,14 @@ if (!class_exists('PC_Quick_Menu')) {
                         $html .= 'data-menu-item-classes="'. self::sanitize_array_of_css_classes( $item->classes ) .'" ';
                         $html .= 'data-menu-item-xfn="'. esc_attr( $item->xfn ) .'" ';
                         $html .= 'data-menu-item-position="'. $count .'">';
-                        $html .= esc_attr( $item->title );
-                        $html .= '<span title="Delete Item" class="pcq_delete_item">X</span>';
+                        $html .= '<div class="pcq-item-title-wrap">';
+                            $html .= '<span class="pcq-title-wrap">'. esc_attr( $item->title ) .'</span>';
+                            $html .= '<div class="pcq-action-wrapper">';
+                                $html .= '<span title="Delete Item" class="pcq_delete_item dashicons dashicons-trash"></span>';
+                                $html .= '<span title="Edit Item" class="pcq_edit_item dashicons dashicons-admin-tools"></span>';
+                            $html .= '</div>';
+                        $html .= '</div><!-- /.pcq-item-title-wrap -->';
+                        $html .= self::edit_item_form( absint( $item->object_id ), esc_attr( $item->title ) );
                     $html .= '</li>';
                     $count++;
                 }
@@ -237,6 +243,19 @@ if (!class_exists('PC_Quick_Menu')) {
             wp_send_json_success( $data );
 
         } // get_menu_items
+
+        private static function edit_item_form( $post_id, $title ){
+
+            $html = '';
+
+            $html .= '<div class=pcq-edit-item-form>';
+                $html .= '<input class="pcq-menu-item-title" value="'. esc_attr( $title ).'" />';
+                $html .= '<button class="pcq-edit-item-button button" data-post_id="'. absint( $post_id ) .'">Update</button>';
+            $html .= '</div>';
+
+            return $html;
+
+        } // edit_item_form
 
         /**
          * Removes the menu entry because we changed which menu the page was in

@@ -28,26 +28,41 @@
 }
 
 .pc_quick_menu_item{
-    padding:3px 5px;
+    padding:5px 5px;
     margin:7px 5px;
     border:1px solid #ccc;
     border-radius:3px;
     background:white;
     box-shadow:2px 2px 2px #ccc;
+    overflow:hidden;
 }
 
 .pc_quick_menu_item:hover{
     cursor:grab;
 }
 
+.pcq-action-wrapper{
+    width:25%;
+    display:block;
+    float:right;
+}
+
+.pcq-title-wrap{
+    width:74%;
+    float:left;
+}
+
+.pcq_edit_item,
 .pcq_delete_item{
     float:right;
     font-size:.7em;
     border:1px solid #CCC;
     border-radius:3px;
-    padding:2px 5px;
+    padding:5px 5px;
+    margin:1px 2px;
 }
 
+.pcq_edit_item:hover,
 .pcq_delete_item:hover{
     box-shadow:1px 1px 1px #CCC;
     cursor:pointer;
@@ -74,6 +89,29 @@
 
 #pcq_user_feedback{
     overflow:hidden;
+}
+
+.pcq-item-title-wrap{
+    overflow:hidden;
+    display:block;
+}
+
+.pcq-edit-item-form{
+    border-top:1px solid #CCC;
+    display:block;
+    overflow:hidden;
+    width:100%;
+    margin:5px 2px 2px 2px;
+    padding:5px;
+}
+
+.pcq-menu-item-title{
+    width:100%;
+    clear:both;
+}
+
+.pcq-edit-item-form .pcq-edit-item-button{
+    margin:5px 0 0 0;
 }
 
 #wp_quick_menu_meta_box .inside .accordion-section-title{
