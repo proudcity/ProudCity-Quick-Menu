@@ -163,6 +163,9 @@ jQuery(document).ready(function($) {
 
     } // pcq_save_updated_menu_items
 
+    /**
+     * Deletes a menu item when you click the trash
+     */
     $(menuWrapper).on('click touchstart', '.pcq_delete_item', function(){
 
         // show spinner
@@ -204,6 +207,21 @@ jQuery(document).ready(function($) {
             }); // end ajax post
     });
 
+    /**
+     * Toggles the display of the label edit form
+     */
+    $(menuWrapper).on('click touchstart', '.pcq_edit_item', function(){
+
+        var parentItem = $(this).parents('.pc_quick_menu_item');
+        var editForm = $(parentItem).find('.pcq-edit-item-form');
+
+        $(editForm).slideToggle();
+
+    });
+
+    /**
+     * Handles saving when you edit a menu item
+     */
     $(menuWrapper).on('click touchstart', '.pcq-edit-item-button', function(e){
 
         e.preventDefault();
