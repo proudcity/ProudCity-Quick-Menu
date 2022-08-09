@@ -96,8 +96,15 @@
     display:block;
 }
 
-.pcq-original{
-    color:#757575;
+.pcq-original{text-decoration:underline;}
+
+.current-menu-item .pcq-original a{
+    color:white;
+}
+
+.current-menu-item .pcq-original a:hover,
+.current-menu-item .pcq-original a:focus{
+    color:#f5f5f5;
 }
 
 .pcq-edit-item-form{

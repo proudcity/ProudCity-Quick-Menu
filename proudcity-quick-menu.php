@@ -291,7 +291,9 @@ if (!class_exists('PC_Quick_Menu')) {
             $html = '';
 
             $html .= '<div class=pcq-edit-item-form>';
-                $html .= '<label for="pcq-menu-item-title">Display Title for <span class="pcq-original">'. get_post_field( 'post_title', absint( $item_object->object_id ) ) .'</span></label>';
+                $html .= '<label for="pcq-menu-item-title">Display title for ';
+                    $html .= '<span class="pcq-original"><a href="'. get_permalink( absint( $item_object->object_id ) ) .'">'. get_post_field( 'post_title', absint( $item_object->object_id ) ) .'</a></span>';
+                $html .= '</label>';
                 $html .= '<input class="pcq-menu-item-title" name="pcq-menu-item-title" value="'. esc_attr( $item_object->title ).'" />';
                 $html .= '<button class="pcq-edit-item-button button" data-menu-item-object-id="'. absint( $post_id ) .'">Update</button>';
                 $html .= '<span class="spinner pcq-edit-spinner"></span>';
@@ -448,7 +450,7 @@ if (!class_exists('PC_Quick_Menu')) {
 
             foreach ($in_which_screens as $screen) {
                 add_meta_box(
-                    'wp_quick_menu_meta_box', __('Add to menu', 'wp_quick_menu'), array($this, 'wp_quick_menu_meta_box_call_back'), esc_attr( $screen ), 'side', 'high'
+                    'wp_quick_menu_meta_box', __('Add to menu', 'wp_quick_menu'), array($this, 'wp_quick_menu_meta_box_call_back'), esc_attr( $screen ), 'side', 'core'
                 );
             }
 
