@@ -96,6 +96,10 @@
     display:block;
 }
 
+.pcq-original{
+    color:#757575;
+}
+
 .pcq-edit-item-form{
     border-top:1px solid #CCC;
     display:none;

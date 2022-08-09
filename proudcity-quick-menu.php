@@ -291,7 +291,7 @@ if (!class_exists('PC_Quick_Menu')) {
             $html = '';
 
             $html .= '<div class=pcq-edit-item-form>';
-                $html .= '<label for="pcq-menu-item-title">Display Title</label>';
+                $html .= '<label for="pcq-menu-item-title">Display Title for <span class="pcq-original">'. get_post_field( 'post_title', absint( $item_object->object_id ) ) .'</span></label>';
                 $html .= '<input class="pcq-menu-item-title" name="pcq-menu-item-title" value="'. esc_attr( $item_object->title ).'" />';
                 $html .= '<button class="pcq-edit-item-button button" data-menu-item-object-id="'. absint( $post_id ) .'">Update</button>';
                 $html .= '<span class="spinner pcq-edit-spinner"></span>';

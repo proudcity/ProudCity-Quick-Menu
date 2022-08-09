@@ -226,6 +226,7 @@ jQuery(document).ready(function($) {
 
         e.preventDefault();
 
+        var menuParentWrap = $(this).parents('.pc_quick_menu_item');
         var parentItem = $(this).parent('.pcq-edit-item-form');
         var editSpinner = $(parentItem).find('.spinner');
         var editPostId = $(parentItem).find('.pcq-edit-item-button').data('menu-item-object-id');
@@ -247,6 +248,7 @@ jQuery(document).ready(function($) {
                 $(editSpinner).css( 'visibility', 'hidden' );
 
                 if ( true === response.data.success ){
+                    $(menuParentWrap).find('.pcq-title-wrap').html(itemTitle);
                     $(editButton).html('Item Updated');
                     $.wait( function(){
                         $(editButton).html('Update');
