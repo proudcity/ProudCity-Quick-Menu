@@ -121,6 +121,11 @@ jQuery(document).ready(function($) {
                         }
                     });
                     $('.pc_quick_menu_item_position').disableSelection();
+
+                    // making sure we default the current menu item to open
+                    var currentItem = $('.pc_quick_menu_wrapper').find('.current-menu-item');
+                    $(currentItem).find('.pcq-edit-item-form').slideDown();
+
                 } // yup
 
                 if ( false === response.data.success ){
