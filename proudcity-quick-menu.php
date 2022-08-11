@@ -229,30 +229,7 @@ if (!class_exists('PC_Quick_Menu')) {
                 // false because we are adding our current item to a newly selected menu
                 if ( ! $in_menu ){
 
-                    // @todo abstract this to it's own function
-                    $post_id = $_POST['current_post_id'];
-
-                    $post_args = array(
-                        'ID' => 0,
-                        'post_title' => get_the_title( absint( $post_id ) ),
-                        'post_type' => 'nav_menu_item',
-                        'post_status' => 'publish',
-                        'menu_order' => absint( $count ),
-                        'post_content' => '',
-                    );
-
-                    $nav_menu_item = wp_insert_post( $post_args );
-
-                    wp_set_object_terms( absint( $nav_menu_item ), absint( $_POST['selected_menu'] ), 'nav_menu', false );
-
-                    update_post_meta( absint( $nav_menu_item ), '_menu_item_url', esc_url( get_the_permalink( absint( $post_id ) ) ) );
-                    update_post_meta( absint( $nav_menu_item ), '_menu_item_target', '_blank' );
-                    update_post_meta( absint( $nav_menu_item ), '_menu_item_classes', array() );
-                    update_post_meta( absint( $nav_menu_item ), '_menu_item_xfn', '' );
-                    update_post_meta( absint( $nav_menu_item ), '_menu_item_object_id', absint( $post_id ) );
-                    update_post_meta( absint( $nav_menu_item ), '_menu_item_object', get_post_type( absint( $post_id ) ) );
-                    update_post_meta( absint( $nav_menu_item ), '_menu_item_type', 'post_type' );
-
+                    $nav_menu_item = self::add_new_item_to_menu( absint( $_POST['current_post_id'] ), $_POST['selected_menu'], $count );
 
                     $html .= self::get_current_item( absint( $_POST['current_post_id'] ), absint( $count ), absint( $nav_menu_item ) );
                 }
@@ -274,6 +251,53 @@ if (!class_exists('PC_Quick_Menu')) {
             wp_send_json_success( $data );
 
         } // get_menu_items
+
+        /**
+         * Adds our new item to a menu because we just selected that menu
+         *
+         * @since 1.2
+         * @author Curtis McHale
+         * @access private
+         *
+         * @param   int         $post_id        required            ID of the CPT item we're adding to the menu
+         * @param   int         $menu_id        required            ID of the menu we're adding to
+         * @param   int         $count          required            Corresponds to the order of the item in the menu
+         * @uses    get_the_title()                                 Returns the title of a post given $post_id
+         * @uses    absint()                                        no negative numbers
+         * @uses    wp_insert_post()                                Adds a post to the WP database
+         * @uses    wp_set_object_terms()                           Adds a term to the post_type
+         * @uses    update_post_meta()                              Adds post metadata given post_id, key, value
+         * @uses    esc_url()                                       Makes our URL safe
+         * @uses    get_the_permalink()                             Returns permalink given post_id
+         * @uses    get_post_type()                                 Returns the post type of the object provide
+         * @return  int         $nav_menu_item                      ID of the newly create nav_menu item
+         */
+        private static function add_new_item_to_menu( $post_id, $menu_id, $count ){
+
+                $post_args = array(
+                    'ID' => 0,
+                    'post_title' => get_the_title( absint( $post_id ) ),
+                    'post_type' => 'nav_menu_item',
+                    'post_status' => 'publish',
+                    'menu_order' => absint( $count ),
+                    'post_content' => '',
+                );
+
+                $nav_menu_item = wp_insert_post( $post_args );
+
+                wp_set_object_terms( absint( $nav_menu_item ), absint( $menu_id ), 'nav_menu', false );
+
+                update_post_meta( absint( $nav_menu_item ), '_menu_item_url', esc_url( get_the_permalink( absint( $post_id ) ) ) );
+                update_post_meta( absint( $nav_menu_item ), '_menu_item_target', '_blank' );
+                update_post_meta( absint( $nav_menu_item ), '_menu_item_classes', array() );
+                update_post_meta( absint( $nav_menu_item ), '_menu_item_xfn', '' );
+                update_post_meta( absint( $nav_menu_item ), '_menu_item_object_id', absint( $post_id ) );
+                update_post_meta( absint( $nav_menu_item ), '_menu_item_object', get_post_type( absint( $post_id ) ) );
+                update_post_meta( absint( $nav_menu_item ), '_menu_item_type', 'post_type' );
+
+                return absint( $nav_menu_item );
+
+        } // add_new_item_to_menu
 
         /**
          * Displays our form to edit the item
