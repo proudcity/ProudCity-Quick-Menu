@@ -187,7 +187,7 @@ if (!class_exists('PC_Quick_Menu')) {
 
             $in_menu = false;
 
-            // if we changed a menu then this will delete the old item entry in the menu
+            // if we changed the menu the item was assigned to then this will delete the old item entry in the menu
             self::maybe_remove_old_menu_entry( $_POST['old_menu_item'] );
 
             $html .= '<ul class="pc_quick_menu_item_position">';
@@ -199,30 +199,7 @@ if (!class_exists('PC_Quick_Menu')) {
                     // sets the id of the nav menu item so we can use it to delete the item if we change menus
                     $nav_menu_item = ( true === $in_menu ) ? absint( $item->db_id ) : '';
 
-                    $html .= '<li ';
-                        $html .= 'class="pc_quick_menu_item ' . sanitize_html_class( $current_item ) .' '. sanitize_html_class( $child_depth ) .'" ';
-                        $html .= 'data-menu-item-db-id="'. absint( $item->db_id ) .'" ';
-                        $html .= 'data-menu-item-object-id="'. absint( $item->object_id ) .'" ';
-                        $html .= 'data-menu-item-object="'. esc_attr( $item->page ) .'" ';
-                        $html .= 'data-menu-item-parent-id="'. absint( $item->menu_item_parent ) .'" ';
-                        $html .= 'data-menu-item-type="'. esc_attr( $item->type ) .'" ';
-                        $html .= 'data-menu-item-title="'. esc_attr( $item->title ) .'" ';
-                        $html .= 'data-menu-item-url="'. esc_url( $item->url ) .'" ';
-                        $html .= 'data-menu-item-description="'. esc_attr( $item->description ) .'" ';
-                        $html .= 'data-menu-item-attr-title="' . esc_attr( $item->attr_title ) .'" ';
-                        $html .= 'data-menu-item-target="'. esc_attr( $item->target ) .'" ';
-                        $html .= 'data-menu-item-classes="'. self::sanitize_array_of_css_classes( $item->classes ) .'" ';
-                        $html .= 'data-menu-item-xfn="'. esc_attr( $item->xfn ) .'" ';
-                        $html .= 'data-menu-item-position="'. $count .'">';
-                        $html .= '<div class="pcq-item-title-wrap">';
-                            $html .= '<span class="pcq-title-wrap">'. esc_attr( $item->title ) .'</span>';
-                            $html .= '<div class="pcq-action-wrapper">';
-                                $html .= '<span title="Delete Item" class="pcq_delete_item dashicons dashicons-trash"></span>';
-                                $html .= '<span title="Edit Item" class="pcq_edit_item dashicons dashicons-admin-tools"></span>';
-                            $html .= '</div>';
-                        $html .= '</div><!-- /.pcq-item-title-wrap -->';
-                        $html .= self::edit_item_form( absint( $item->db_id ), $item );
-                    $html .= '</li>';
+                    $html .= self::get_single_item( $item, $current_item, $child_depth, $count );
                     $count++;
                 }
 
@@ -403,6 +380,50 @@ if (!class_exists('PC_Quick_Menu')) {
         }
 
         /**
+         * Returns a single item for the menu
+         *
+         * @since 1.2
+         * @author Curtis McHale
+         *
+         * @param   object          $item           required            Menu item object
+         * @param   string          $current_item   required            adds current-menu-item if we're on the page represented by the menu item
+         * @param   string          $child_depth    required            Adds a class if item is a nested menu
+         * @param   int             $count          required            Menu order
+         */
+        private static function get_single_item( $item, $current_item, $child_depth, $count ){
+
+            $html = '';
+
+            $html .= '<li ';
+                $html .= 'class="pc_quick_menu_item ' . sanitize_html_class( $current_item ) .' '. sanitize_html_class( $child_depth ) .'" ';
+                $html .= 'data-menu-item-db-id="'. absint( $item->db_id ) .'" ';
+                $html .= 'data-menu-item-object-id="'. absint( $item->object_id ) .'" ';
+                $html .= 'data-menu-item-object="'. esc_attr( $item->page ) .'" ';
+                $html .= 'data-menu-item-parent-id="'. absint( $item->menu_item_parent ) .'" ';
+                $html .= 'data-menu-item-type="'. esc_attr( $item->type ) .'" ';
+                $html .= 'data-menu-item-title="'. esc_attr( $item->title ) .'" ';
+                $html .= 'data-menu-item-url="'. esc_url( $item->url ) .'" ';
+                $html .= 'data-menu-item-description="'. esc_attr( $item->description ) .'" ';
+                $html .= 'data-menu-item-attr-title="' . esc_attr( $item->attr_title ) .'" ';
+                $html .= 'data-menu-item-target="'. esc_attr( $item->target ) .'" ';
+                $html .= 'data-menu-item-classes="'. self::sanitize_array_of_css_classes( $item->classes ) .'" ';
+                $html .= 'data-menu-item-xfn="'. esc_attr( $item->xfn ) .'" ';
+                $html .= 'data-menu-item-position="'. $count .'">';
+                $html .= '<div class="pcq-item-title-wrap">';
+                    $html .= '<span class="pcq-title-wrap">'. esc_attr( $item->title ) .'</span>';
+                    $html .= '<div class="pcq-action-wrapper">';
+                        $html .= '<span title="Delete Item" class="pcq_delete_item dashicons dashicons-trash"></span>';
+                        $html .= '<span title="Edit Item" class="pcq_edit_item dashicons dashicons-admin-tools"></span>';
+                    $html .= '</div>';
+                $html .= '</div><!-- /.pcq-item-title-wrap -->';
+                $html .= self::edit_item_form( absint( $item->db_id ), $item );
+            $html .= '</li>';
+
+            return $html;
+
+        } // get_single_item
+
+        /**
          * Retrieves the HTML for the current item
          *
          * @since 1.2
@@ -422,9 +443,14 @@ if (!class_exists('PC_Quick_Menu')) {
             $html .= '<li class="pc_quick_menu_item current-menu-item" ';
                 $html .= 'data-menu-item-object-id="'. absint( $post_id ) .'" ';
                 $html .= 'data-menu-item-db-id="' . absint( $db_id ) .'" ';
-                $html .= 'data-item_order="'. absint( $order ) .'">';
-                $html .= esc_attr( $title );
-                $html .= '<span title="Delete Item" class="pcq_delete_item">X</span>';
+                $html .= 'data-menu-item-position="'. absint( $order ) .'">';
+                $html .= '<div class="pcq-item-title-wrap">';
+                    $html .= '<span class="pcq-title-wrap">'. esc_attr( $title ) .'</span>';
+                    $html .= '<div class="pcq-action-wrapper">';
+                        $html .= '<span title="Delete Item" class="pcq_delete_item dashicons dashicons-trash"></span>';
+                        $html .= '<span title="Edit Item" class="pcq_edit_item dashicons dashicons-admin-tools"></span>';
+                    $html .= '</div>';
+                $html .= '</div><!-- /.pcq-item-title-wrap -->';
             $html .= '</li>';
 
             return $html;
