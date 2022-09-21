@@ -26,10 +26,6 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-if (!defined('WPINC')) {
-    die;
-}
-
 require_once ABSPATH . 'wp-admin/includes/nav-menu.php';
 
 if (!class_exists('PC_Quick_Menu')) {

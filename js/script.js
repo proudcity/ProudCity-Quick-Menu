@@ -138,6 +138,7 @@ jQuery(document).ready(function($) {
     }
 
     /**
+     * Sends our updated menu items to PHP for saving the attributes
      *
      * @param {int}     menuToUpdate    required            ID of the menu we need to update
      * @param {array}   updatedItems    required            nested array of the menu items we need to update via `wp_save_nav_menu`
