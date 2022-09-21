@@ -94,6 +94,7 @@ jQuery(document).ready(function($) {
                                var menuItemAttrTitle = $(this).data('menu-item-attr-title');
                                var menuItemTarget = $(this).data('menu-item-target');
                                var menuItemClasses = $(this).data('menu-item-classes');
+                               var menuItemDepth = $(this).data('menu-item-depth');
                                var menuItemXfn = $(this).data('menu-item-xfn');
                                var menuItemPosition = $(this).data('menu-item-position');
 

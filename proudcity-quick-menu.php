@@ -189,7 +189,7 @@ if (!class_exists('PC_Quick_Menu')) {
             $html .= '<ul class="pc_quick_menu_item_position">';
                 foreach( $menu_items as $item ){
                     $current_item = absint( $item->object_id ) == absint( $_POST['current_post_id'] ) ? 'current-menu-item' : '';
-                    $child_depth = self::is_item_a_child_item( $item ) ? 'item-depth-1' : '';
+                    $child_depth = self::is_item_a_child_item( $item ) ? self::get_child_item_depth( $item ) : '0';
                     $in_menu = self::is_item_already_in_menu( $in_menu, absint( $item->object_id ), absint( $_POST['current_post_id'] ) );
 
                     // sets the id of the nav menu item so we can use it to delete the item if we change menus
@@ -224,6 +224,37 @@ if (!class_exists('PC_Quick_Menu')) {
             wp_send_json_success( $data );
 
         } // get_menu_items
+
+        /**
+         * Figures out the depth of an item so we can give it the proper HTML class
+         *
+         * @since 2022.09.21
+         * @author Curtis
+         * @access private
+         *
+         * @param   object          $item           required                The menu item we're looking at
+         * @return  int             $depth                                  The depth of the menu item
+         */
+        private static function get_child_item_depth( $item ){
+
+            $depth = 0;
+            $test_item_id = $item->db_id;
+
+            if ( self::is_item_a_child_item( $item ) ){
+                $depth = 1;
+                $parent_id = get_post_meta( absint( $item->db_id ), '_menu_item_menu_item_parent', true );
+                $two_parent_id = get_post_meta( absint( $parent_id ), '_menu_item_menu_item_parent', true );
+
+                // yup this is fairly lame and does not support any level deeper than 2
+                if( 0 != $two_parent_id ){
+                    $depth = 2;
+                }
+
+            }
+
+            return (int) $depth;
+
+        }
 
         /**
          * Adds our new item to a menu because we just selected that menu
@@ -347,7 +378,8 @@ if (!class_exists('PC_Quick_Menu')) {
         private static function is_item_a_child_item( $item ){
 
             $is_child = false;
-            if ( isset( $item->menu_item_parent ) && 0 != absint( $item->menu_item_parent ) ){
+            $parent_id = get_post_meta( absint( $item->db_id ), '_menu_item_menu_item_parent', true );
+            if ( 0 != absint( $parent_id ) ){
                 $is_child = true;
             }
 
@@ -391,7 +423,7 @@ if (!class_exists('PC_Quick_Menu')) {
             $html = '';
 
             $html .= '<li ';
-                $html .= 'class="pc_quick_menu_item ' . sanitize_html_class( $current_item ) .' '. sanitize_html_class( $child_depth ) .'" ';
+                $html .= 'class="pc_quick_menu_item ' . sanitize_html_class( $current_item ) .' '. sanitize_html_class( 'item-depth-' . $child_depth ) .'" ';
                 $html .= 'data-menu-item-db-id="'. absint( $item->db_id ) .'" ';
                 $html .= 'data-menu-item-object-id="'. absint( $item->object_id ) .'" ';
                 $html .= 'data-menu-item-object="'. esc_attr( $item->page ) .'" ';
@@ -404,6 +436,7 @@ if (!class_exists('PC_Quick_Menu')) {
                 $html .= 'data-menu-item-target="'. esc_attr( $item->target ) .'" ';
                 $html .= 'data-menu-item-classes="'. self::sanitize_array_of_css_classes( $item->classes ) .'" ';
                 $html .= 'data-menu-item-xfn="'. esc_attr( $item->xfn ) .'" ';
+                $html .= 'data-menu-item-depth="' . absint( $child_depth ) .'"';
                 $html .= 'data-menu-item-position="'. $count .'">';
                 $html .= '<div class="pcq-item-title-wrap">';
                     $html .= '<span class="pcq-title-wrap">'. esc_attr( $item->title ) .'</span>';
