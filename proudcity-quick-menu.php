@@ -186,27 +186,32 @@ if (!class_exists('PC_Quick_Menu')) {
             // if we changed the menu the item was assigned to then this will delete the old item entry in the menu
             self::maybe_remove_old_menu_entry( $_POST['old_menu_item'] );
 
-            $html .= '<ul class="pc_quick_menu_item_position">';
-                foreach( $menu_items as $item ){
-                    $current_item = absint( $item->object_id ) == absint( $_POST['current_post_id'] ) ? 'current-menu-item' : '';
-                    $child_depth = self::is_item_a_child_item( $item ) ? self::get_child_item_depth( $item ) : '0';
-                    $in_menu = self::is_item_already_in_menu( $in_menu, absint( $item->object_id ), absint( $_POST['current_post_id'] ) );
+            $html .= '<div class="pc-sortable-menu">';
+                $html .= '<ol class="pc_quick_menu_item_position">';
+                    foreach( $menu_items as $item ){
+                        $current_item = absint( $item->object_id ) == absint( $_POST['current_post_id'] ) ? 'current-menu-item' : '';
+                        $in_menu = self::is_item_already_in_menu( $in_menu, absint( $item->object_id ), absint( $_POST['current_post_id'] ) );
 
-                    // sets the id of the nav menu item so we can use it to delete the item if we change menus
-                    $nav_menu_item = ( true === $in_menu ) ? absint( $item->db_id ) : '';
+                        // sets the id of the nav menu item so we can use it to delete the item if we change menus
+                        $nav_menu_item = ( true === $in_menu ) ? absint( $item->db_id ) : '';
 
-                    $html .= self::get_single_item( $item, $current_item, $child_depth, $count );
-                    $count++;
-                }
+                        $html .= self::get_single_item( $item, $current_item, $count );
+                        if ( self::menu_item_has_children( $item ) ){
+                            $html .= 'has children';
+                            //self::get_child_menu_items( $item );
+                        }
+                        $count++;
+                    }
 
-                // false because we are adding our current item to a newly selected menu
-                if ( ! $in_menu ){
+                    // false because we are adding our current item to a newly selected menu
+                    if ( ! $in_menu ){
 
-                    $nav_menu_item = self::add_new_item_to_menu( absint( $_POST['current_post_id'] ), $_POST['selected_menu'], $count );
+                        $nav_menu_item = self::add_new_item_to_menu( absint( $_POST['current_post_id'] ), $_POST['selected_menu'], $count );
 
-                    $html .= self::get_current_item( absint( $_POST['current_post_id'] ), absint( $count ), absint( $nav_menu_item ) );
-                }
-            $html .= '</ul>';
+                        $html .= self::get_current_item( absint( $_POST['current_post_id'] ), absint( $count ), absint( $nav_menu_item ) );
+                    }
+                $html .= '</ol>';
+            $html .= '</div><!-- /.pc-sortable-menu -->';
 
             // used to tell what the db-id of the item is in case we change the menu so we can delete it from the old one
             $html .= '<div id="old-menu" data-old-menu="'. absint( $nav_menu_item ) .'"></div>';
@@ -226,32 +231,39 @@ if (!class_exists('PC_Quick_Menu')) {
         } // get_menu_items
 
         /**
-         * Figures out the depth of an item so we can give it the proper HTML class
+         * Returns true if menu item has children
          *
-         * @since 2022.09.21
-         * @author Curtis
-         * @access private
+         * Checks for post_meta with a menu_item_parent key set to the current
+         * post_id but NOT 0 which means it has no parent
          *
-         * @param   object          $item           required                The menu item we're looking at
-         * @return  int             $depth                                  The depth of the menu item
          */
-        private static function get_child_item_depth( $item ){
+        private static function menu_item_has_children( $item ){
 
-            $depth = 0;
+            $has_children = false;
 
-            if ( self::is_item_a_child_item( $item ) ){
-                $depth = 1;
-                $parent_id = get_post_meta( absint( $item->db_id ), '_menu_item_menu_item_parent', true );
-                $two_parent_id = get_post_meta( absint( $parent_id ), '_menu_item_menu_item_parent', true );
+            $args = array(
+                'post_type' => 'nav_menu_item',
+                'meta_query' => array(
+                    array(
+                        'key' => '_menu_item_menu_item_parent',
+                        'value' => absint( $item->db_id ),
+                        'compare' => '=',
+                    ),
+                    array(
+                        'key' => '_menu_item_menu_item_parent',
+                        'value' => 0,
+                        'compare' => '!='
+                    )
+                ),
+            );
 
-                // yup this is fairly lame and does not support any level deeper than 2
-                if( 0 != $two_parent_id ){
-                    $depth = 2;
-                }
+            $children = get_posts( $args );
 
+            if ( ! empty( $children ) ){
+                $has_children = true;
             }
 
-            return (int) $depth;
+            return (bool) $has_children;
 
         }
 
@@ -417,12 +429,12 @@ if (!class_exists('PC_Quick_Menu')) {
          * @param   string          $child_depth    required            Adds a class if item is a nested menu
          * @param   int             $count          required            Menu order
          */
-        private static function get_single_item( $item, $current_item, $child_depth, $count ){
+        private static function get_single_item( $item, $current_item, $count ){
 
             $html = '';
 
             $html .= '<li ';
-                $html .= 'class="pc_quick_menu_item ' . sanitize_html_class( $current_item ) .' '. sanitize_html_class( 'item-depth-' . $child_depth ) .'" ';
+                $html .= 'class="pc_quick_menu_item ' . sanitize_html_class( $current_item ) .'"';
                 $html .= 'data-menu-item-db-id="'. absint( $item->db_id ) .'" ';
                 $html .= 'data-menu-item-object-id="'. absint( $item->object_id ) .'" ';
                 $html .= 'data-menu-item-object="'. esc_attr( $item->page ) .'" ';
@@ -435,7 +447,6 @@ if (!class_exists('PC_Quick_Menu')) {
                 $html .= 'data-menu-item-target="'. esc_attr( $item->target ) .'" ';
                 $html .= 'data-menu-item-classes="'. self::sanitize_array_of_css_classes( $item->classes ) .'" ';
                 $html .= 'data-menu-item-xfn="'. esc_attr( $item->xfn ) .'" ';
-                $html .= 'data-menu-item-depth="' . absint( $child_depth ) .'"';
                 $html .= 'data-menu-item-position="'. $count .'">';
                 $html .= '<div class="pcq-item-title-wrap">';
                     $html .= '<span class="pcq-title-wrap">'. esc_attr( $item->title ) .'</span>';
