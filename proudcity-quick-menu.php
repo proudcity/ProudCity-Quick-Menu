@@ -238,7 +238,6 @@ if (!class_exists('PC_Quick_Menu')) {
         private static function get_child_item_depth( $item ){
 
             $depth = 0;
-            $test_item_id = $item->db_id;
 
             if ( self::is_item_a_child_item( $item ) ){
                 $depth = 1;
