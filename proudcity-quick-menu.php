@@ -194,15 +194,9 @@ if (!class_exists('PC_Quick_Menu')) {
 
                         // sets the id of the nav menu item so we can use it to delete the item if we change menus
                         $nav_menu_item = ( true === $in_menu ) ? absint( $item->db_id ) : '';
-
                         $html .= self::get_single_item( $item, $current_item, $count );
 
                         $count++;
-
-                        if ( self::menu_item_has_children( $item->db_id ) ){
-                            // I may need to return an array with $html and $count values updated
-                            $html .= self::get_child_menu( $item->db_id, $count );
-                        }
 
                     }
 
@@ -255,9 +249,10 @@ if (!class_exists('PC_Quick_Menu')) {
 
             $html .= '<ol class="dd-list pc_quick_menu_item_position">';
                 foreach( $child_items as $item ){
-                    // need to build out the expected object for self::get_single_item()
-                    $html .= '<li class="dd-item pc_quick_menu_item">' . absint( $item->ID ) .'</li>';
+                    $current_item = null;
 
+                update_option( 'sfn_test_child', $item );
+                    $html .=  self::get_single_item( $item, $current_item, $count );
                     if ( self::menu_item_has_children( $item->ID ) ){
                         $html .= self::get_child_menu( absint( $item->ID ), $count );
                     }
@@ -266,6 +261,85 @@ if (!class_exists('PC_Quick_Menu')) {
 
             return $html;
 
+        }
+
+        /**
+         * Sets up the data format for the item depending on the data type of the item
+         */
+        private static function setup_item_data( $item, $count ){
+
+            $updated_item = array();
+
+            $updated_item['db_id'] = absint( $item->ID );
+            $updated_item['object_id'] = self::set_object_id( $item->object_id, $item->ID );
+            $updated_item['page'] = ''; // @todo figure this out
+            $updated_item['menu_item_parent'] = absint( $item->menu_item_parent );
+            $updated_item['type'] = esc_attr( $item->type );
+            $updated_item['title'] = self::get_item_title( $item->title, $updated_item['object_id'] );
+            $updated_item['url'] = esc_url( $item->url );
+            $updated_item['description'] = esc_attr( $item->description );
+            $updated_item['attr_title'] = esc_attr( $item->attr_title );
+            $updated_item['target'] = esc_attr( $item->target );
+            $updated_item['classes'] = $item->classes;
+            $updated_item['xfn'] = esc_attr( $item->xfn );
+            $updated_item['count'] = absint( $count );
+
+            return (array) $updated_item;
+
+        }
+
+        /**
+         * Sets the ID of the object.
+         *
+         * Nav Menu objects have this set but if we're getting wp_nav_menu results
+         * we need to work this out from the post_meta field for the post_type entry.
+         *
+         * In a default nav menu object the `object_id` corresponds to the post that the nav
+         * menu entry is referring to.
+         *
+         * @since 2022-09-22
+         * @author Curtis
+         * @access private
+         *
+         * @param   int         $object_id              required            Object id if we have it
+         * @param   int         $item_id                required            ID of the item
+         * @uses    get_post_meta()                                         Returns post meta given post_id and param
+         * @uses    absint()                                                no negative numbers
+         * @return  int         $object_id                                  The worked out object id
+         */
+        private static function set_object_id( $object_id, $item_id ){
+
+            if ( ! isset( $object_id ) || 0 == $object_id ){
+                $object_id = get_post_meta( absint( $item_id ), '_menu_item_object_id', true );
+            }
+
+            return absint( $object_id );
+        }
+
+        /**
+         * Figures out the title.
+         *
+         * Menu objects have their title site, post objects mean I need to work out the title
+         * from the root post time that the navigation item is linking to.
+         *
+         * @since 2022-09-22
+         * @author Curtis
+         * @access private
+         *
+         * @param   string      $item_title         required            Default title setting which may be empty
+         * @param   int         $item_id            required            ID of the item we want to get a title for
+         * @uses    get_the_title()                                     Returns post title given post_id
+         * @return  string      $title                                  The title we have worked out
+         */
+        private static function get_item_title( $item_title, $item_id ){
+
+            if ( isset( $item_title ) && ! empty( $item_title ) ){
+                $title = $item_title;
+            } else {
+                $title = get_the_title( absint( $item_id ) );
+            }
+
+            return esc_attr( $title );
         }
 
         /**
@@ -407,9 +481,9 @@ if (!class_exists('PC_Quick_Menu')) {
 
             $html .= '<div class=pcq-edit-item-form>';
                 $html .= '<label for="pcq-menu-item-title">Display title for ';
-                    $html .= '<span class="pcq-original"><a href="'. get_permalink( absint( $item_object->object_id ) ) .'">'. get_post_field( 'post_title', absint( $item_object->object_id ) ) .'</a></span>';
+                    $html .= '<span class="pcq-original"><a href="'. get_permalink( absint( $item_object['object_id'] ) ) .'">'. get_post_field( 'post_title', absint( $item_object['object_id'] ) ) .'</a></span>';
                 $html .= '</label>';
-                $html .= '<input class="pcq-menu-item-title" name="pcq-menu-item-title" value="'. esc_attr( $item_object->title ).'" />';
+                $html .= '<input class="pcq-menu-item-title" name="pcq-menu-item-title" value="'. esc_attr( $item_object['title'] ).'" />';
                 $html .= '<button class="pcq-edit-item-button button" data-menu-item-object-id="'. absint( $post_id ) .'">Update</button>';
                 $html .= '<span class="spinner pcq-edit-spinner"></span>';
             $html .= '</div>';
@@ -447,9 +521,11 @@ if (!class_exists('PC_Quick_Menu')) {
 
             $sanitized_classes = '';
 
+            /*
             foreach( $class_array as $key => $value ){
                 $sanitized_classes .= sanitize_html_class( $value ) . ' ';
             }
+            */
 
             return (string) $sanitized_classes;
         }
@@ -509,29 +585,37 @@ if (!class_exists('PC_Quick_Menu')) {
 
             $html = '';
 
+            $setup_item = self::setup_item_data( $item, $count );
+
             $html .= '<li ';
-                $html .= 'class="pc_quick_menu_item ' . sanitize_html_class( $current_item ) .'"';
-                $html .= 'data-menu-item-db-id="'. absint( $item->db_id ) .'" ';
-                $html .= 'data-menu-item-object-id="'. absint( $item->object_id ) .'" ';
-                $html .= 'data-menu-item-object="'. esc_attr( $item->page ) .'" ';
-                $html .= 'data-menu-item-parent-id="'. absint( $item->menu_item_parent ) .'" ';
-                $html .= 'data-menu-item-type="'. esc_attr( $item->type ) .'" ';
-                $html .= 'data-menu-item-title="'. esc_attr( $item->title ) .'" ';
-                $html .= 'data-menu-item-url="'. esc_url( $item->url ) .'" ';
-                $html .= 'data-menu-item-description="'. esc_attr( $item->description ) .'" ';
-                $html .= 'data-menu-item-attr-title="' . esc_attr( $item->attr_title ) .'" ';
-                $html .= 'data-menu-item-target="'. esc_attr( $item->target ) .'" ';
-                $html .= 'data-menu-item-classes="'. self::sanitize_array_of_css_classes( $item->classes ) .'" ';
-                $html .= 'data-menu-item-xfn="'. esc_attr( $item->xfn ) .'" ';
-                $html .= 'data-menu-item-position="'. $count .'">';
+                $html .= 'class="pc_quick_menu_item dd-item' . sanitize_html_class( $current_item ) .'"';
+                $html .= 'data-menu-item-db-id="'. absint( $setup_item['db_id'] ) .'" ';
+                $html .= 'data-menu-item-object-id="'. absint( $setup_item['object_id'] ) .'" ';
+                $html .= 'data-menu-item-object="'. esc_attr( $setup_item['page'] ) .'" ';
+                $html .= 'data-menu-item-parent-id="'. absint( $setup_item['menu_item_parent'] ) .'" ';
+                $html .= 'data-menu-item-type="'. esc_attr( $setup_item['type'] ) .'" ';
+                $html .= 'data-menu-item-title="'. esc_attr( $setup_item['title'] ) .'" ';
+                $html .= 'data-menu-item-url="'. esc_url( $setup_item['url'] ) .'" ';
+                $html .= 'data-menu-item-description="'. esc_attr( $setup_item['description'] ) .'" ';
+                $html .= 'data-menu-item-attr-title="' . esc_attr( $setup_item['attr_title'] ) .'" ';
+                $html .= 'data-menu-item-target="'. esc_attr( $setup_item['target'] ) .'" ';
+                $html .= 'data-menu-item-classes="'. self::sanitize_array_of_css_classes( $setup_item['classes'] ) .'" ';
+                $html .= 'data-menu-item-xfn="'. esc_attr( $setup_item['xfn'] ) .'" ';
+                $html .= 'data-menu-item-position="'. absint( $setup_item['count'] ) .'">';
                 $html .= '<div class="pcq-item-title-wrap">';
-                    $html .= '<span class="pcq-title-wrap">'. esc_attr( $item->title ) .'</span>';
+                    $html .= '<span class="pcq-title-wrap">'. esc_attr( $setup_item['title'] ) .'</span>';
                     $html .= '<div class="pcq-action-wrapper">';
                         $html .= '<span title="Delete Item" class="pcq_delete_item dashicons dashicons-trash"></span>';
                         $html .= '<span title="Edit Item" class="pcq_edit_item dashicons dashicons-admin-tools"></span>';
                     $html .= '</div>';
                 $html .= '</div><!-- /.pcq-item-title-wrap -->';
-                $html .= self::edit_item_form( absint( $item->db_id ), $item );
+                $html .= self::edit_item_form( absint( $setup_item['db_id'] ), $setup_item );
+
+                if ( self::menu_item_has_children( $setup_item['db_id'] ) ){
+                    // I may need to return an array with $html and $count values updated
+                    $html .= self::get_child_menu( $setup_item['db_id'], $count );
+                }
+
             $html .= '</li>';
 
             return $html;

@@ -27,6 +27,10 @@
     overflow:hidden;
 }
 
+ol.pc_quick_menu_item_position:first-of-type{
+    margin-left:0;
+}
+
 .pc_quick_menu_item{
     padding:5px 5px;
     margin:7px 5px;
