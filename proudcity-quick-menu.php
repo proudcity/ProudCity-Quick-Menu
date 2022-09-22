@@ -196,11 +196,14 @@ if (!class_exists('PC_Quick_Menu')) {
                         $nav_menu_item = ( true === $in_menu ) ? absint( $item->db_id ) : '';
 
                         $html .= self::get_single_item( $item, $current_item, $count );
-                        if ( self::menu_item_has_children( $item->db_id ) ){
-                            $html .= 'has children';
-                            //self::get_child_menu_items( $item );
-                        }
+
                         $count++;
+
+                        if ( self::menu_item_has_children( $item->db_id ) ){
+                            // I may need to return an array with $html and $count values updated
+                            $html .= self::get_child_menu( $item->db_id, $count );
+                        }
+
                     }
 
                     // false because we are adding our current item to a newly selected menu
@@ -229,6 +232,71 @@ if (!class_exists('PC_Quick_Menu')) {
             wp_send_json_success( $data );
 
         } // get_menu_items
+
+        /**
+         * Builds a sub menu. Assumes you've already checked there are menu item children
+         *
+         * @since 2022-09-22
+         * @author Curtis
+         * @access private
+         *
+         * @param   int         $parent_id      required            ID of the parent menu item
+         * @param   int         $count          required            The menu position of the item
+         * @uses    self::get_child_menu_items()                    Returns objects for child items
+         * @uses    self::menu_item_has_children()                  True if menu item has children
+         * @uses    self::get_child_menu()                          Returns HTML for built child menu
+         * @return  string      $html                               Built out child menu items
+         */
+        private static function get_child_menu( $parent_id, $count ){
+
+            $html = '';
+
+            $child_items = self::get_child_menu_items( absint( $parent_id ) );
+
+            $html .= '<ol class="dd-list pc_quick_menu_item_position">';
+                foreach( $child_items as $item ){
+                    // need to build out the expected object for self::get_single_item()
+                    $html .= '<li class="dd-item pc_quick_menu_item">' . absint( $item->ID ) .'</li>';
+
+                    if ( self::menu_item_has_children( $item->ID ) ){
+                        $html .= self::get_child_menu( absint( $item->ID ), $count );
+                    }
+                }
+            $html .= '</ol>';
+
+            return $html;
+
+        }
+
+        /**
+         * Returns child menu items
+         *
+         * @since 2022-09-22
+         * @author Curtis
+         * @access private
+         *
+         * @param   int         $parent_id          required            ID of the menu item we want children for
+         * @uses    absint()                                            No negative numbers
+         * @uses    get_posts()                                         Returns posts given args
+         * @return  object      $children                               Array of post objects
+         */
+        private static function get_child_menu_items( $parent_id ){
+
+            $args = array(
+                'post_type' => 'nav_menu_item',
+                'meta_query' => array(
+                    array(
+                        'key' => '_menu_item_menu_item_parent',
+                        'value' => absint( $parent_id ),
+                        'compare' => '=',
+                    ),
+                ),
+            );
+
+            $children = get_posts( $args );
+
+            return $children;
+        }
 
         /**
          * Returns true if menu item has children
