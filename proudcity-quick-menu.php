@@ -196,7 +196,7 @@ if (!class_exists('PC_Quick_Menu')) {
                         $nav_menu_item = ( true === $in_menu ) ? absint( $item->db_id ) : '';
 
                         $html .= self::get_single_item( $item, $current_item, $count );
-                        if ( self::menu_item_has_children( $item ) ){
+                        if ( self::menu_item_has_children( $item->db_id ) ){
                             $html .= 'has children';
                             //self::get_child_menu_items( $item );
                         }
@@ -240,12 +240,12 @@ if (!class_exists('PC_Quick_Menu')) {
          * @author Curtis
          * @access private
          *
-         * @param   object      $item           required            The menu item we are checking for children
+         * @param   int         $item_id           required         ID for the item we are checking
          * @uses    absint()                                        No negative numbers
          * @uses    get_posts()                                     Returns posts given args
          * @return  bool        $has_children                       True if there are children
          */
-        private static function menu_item_has_children( $item ){
+        private static function menu_item_has_children( $item_id ){
 
             $has_children = false;
 
@@ -254,7 +254,7 @@ if (!class_exists('PC_Quick_Menu')) {
                 'meta_query' => array(
                     array(
                         'key' => '_menu_item_menu_item_parent',
-                        'value' => absint( $item->db_id ),
+                        'value' => absint( $item_id ),
                         'compare' => '=',
                     ),
                     array(
