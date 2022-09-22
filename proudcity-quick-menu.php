@@ -236,6 +236,14 @@ if (!class_exists('PC_Quick_Menu')) {
          * Checks for post_meta with a menu_item_parent key set to the current
          * post_id but NOT 0 which means it has no parent
          *
+         * @since 2022-09-21
+         * @author Curtis
+         * @access private
+         *
+         * @param   object      $item           required            The menu item we are checking for children
+         * @uses    absint()                                        No negative numbers
+         * @uses    get_posts()                                     Returns posts given args
+         * @return  bool        $has_children                       True if there are children
          */
         private static function menu_item_has_children( $item ){
 
