@@ -264,14 +264,27 @@ if (!class_exists('PC_Quick_Menu')) {
         }
 
         /**
-         * Sets up the data format for the item depending on the data type of the item
+         * Sets up the data format for the item depending on the data type of the item.
+         *
+         * @since 2022-10-02
+         * @author Curtis McHale
+         * @access private
+         *
+         * @param   object      $item           required            The object we want to get data out of
+         * @param   ??          $count                              Not even sure we need this
+         * @uses    absint()                                        No negative numbers
+         * @uses    self::set_object_id()                           Returns the proper object_id after dealing with our 2 data types
+         * @uses    self::get_item_title()                          Determines the title of the item
+         * @return  array       $updated_items                      The array of items that are updated depending on the data recieved
          */
         private static function setup_item_data( $item, $count ){
 
             $updated_item = array();
 
+            $object_id = self::set_object_id( absint( $item->object_id ), absint( $item->ID ) );
+
             $updated_item['db_id'] = absint( $item->ID );
-            $updated_item['object_id'] = self::set_object_id( $item->object_id, $item->ID );
+            $updated_item['object_id'] = absint( $object_id );
             $updated_item['page'] = ''; // @todo figure this out
             $updated_item['menu_item_parent'] = absint( $item->menu_item_parent );
             $updated_item['type'] = esc_attr( $item->type );
@@ -280,8 +293,8 @@ if (!class_exists('PC_Quick_Menu')) {
             $updated_item['description'] = esc_attr( $item->description );
             $updated_item['attr_title'] = esc_attr( $item->attr_title );
             $updated_item['target'] = esc_attr( $item->target );
-            $updated_item['classes'] = $item->classes;
-            $updated_item['xfn'] = esc_attr( $item->xfn );
+            $updated_item['classes'] = self::get_menu_item_classes( absint( $item->ID ) );
+            $updated_item['xfn'] = get_post_meta( absint( $item->ID ), '_menu_item_xfn', true );
             $updated_item['count'] = absint( $count );
 
             return (array) $updated_item;
@@ -519,15 +532,37 @@ if (!class_exists('PC_Quick_Menu')) {
          */
         private static function sanitize_array_of_css_classes( $class_array ){
 
+
             $sanitized_classes = '';
 
-            /*
             foreach( $class_array as $key => $value ){
                 $sanitized_classes .= sanitize_html_class( $value ) . ' ';
             }
-            */
+
 
             return (string) $sanitized_classes;
+        }
+
+        /**
+         * Returns a sanitized string of classes for a given menu item
+         *
+         * @since 2022-10-04
+         * @author Curtis McHale
+         * @access private
+         *
+         * @param   int         $menu_item_id       required            ID for the nav_menu_item we want classes
+         * @uses    get_post_meta()                                     Returns post metadata given post_id and key
+         * @uses    self::sanitize_array_of_css_classes()               Takes array returns string of sanitized classes
+         * @return  string      $classes                                Sanitized string of HTML classes
+         */
+        private static function get_menu_item_classes( $menu_item_id ){
+
+            $classes = get_post_meta( absint( $menu_item_id ), '_menu_item_classes', true );
+
+            $classes = self::sanitize_array_of_css_classes( $classes );
+
+            return (string) $classes;
+
         }
 
         /**
@@ -599,7 +634,7 @@ if (!class_exists('PC_Quick_Menu')) {
                 $html .= 'data-menu-item-description="'. esc_attr( $setup_item['description'] ) .'" ';
                 $html .= 'data-menu-item-attr-title="' . esc_attr( $setup_item['attr_title'] ) .'" ';
                 $html .= 'data-menu-item-target="'. esc_attr( $setup_item['target'] ) .'" ';
-                $html .= 'data-menu-item-classes="'. self::sanitize_array_of_css_classes( $setup_item['classes'] ) .'" ';
+                $html .= 'data-menu-item-classes="'. esc_attr( $setup_item['classes'] ) .'" ';
                 $html .= 'data-menu-item-xfn="'. esc_attr( $setup_item['xfn'] ) .'" ';
                 $html .= 'data-menu-item-position="'. absint( $setup_item['count'] ) .'">';
                 $html .= '<div class="pcq-item-title-wrap">';
