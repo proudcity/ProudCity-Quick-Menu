@@ -219,7 +219,7 @@ jQuery(document).ready(function($) {
      */
     $(menuWrapper).on('click touchstart', '.pcq_edit_item', function(){
 
-        var parentItem = $(this).parents('.pc_quick_menu_item');
+        var parentItem = $(this).closest('.pc_quick_menu_item');
         var editForm = $(parentItem).find('.pcq-edit-item-form');
 
         $(editForm).slideToggle();
