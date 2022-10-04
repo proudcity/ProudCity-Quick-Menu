@@ -251,7 +251,6 @@ if (!class_exists('PC_Quick_Menu')) {
                 foreach( $child_items as $item ){
                     $current_item = null;
 
-                update_option( 'sfn_test_child', $item );
                     $html .=  self::get_single_item( $item, $current_item, $count );
                     if ( self::menu_item_has_children( $item->ID ) ){
                         $html .= self::get_child_menu( absint( $item->ID ), $count );
@@ -287,12 +286,12 @@ if (!class_exists('PC_Quick_Menu')) {
             $updated_item['object_id'] = absint( $object_id );
             $updated_item['page'] = ''; // @todo figure this out
             $updated_item['menu_item_parent'] = absint( $item->menu_item_parent );
-            $updated_item['type'] = esc_attr( $item->type );
+            $updated_item['type'] = esc_attr( get_post_meta( absint( $item->ID ), '_menu_item_type', true ) );
             $updated_item['title'] = self::get_item_title( $item->title, $updated_item['object_id'] );
             $updated_item['url'] = esc_url( $item->url );
             $updated_item['description'] = esc_attr( $item->description );
             $updated_item['attr_title'] = esc_attr( $item->attr_title );
-            $updated_item['target'] = esc_attr( $item->target );
+            $updated_item['target'] = esc_attr( get_post_meta( absint( $item->ID ), '_menu_item_target', true ) );
             $updated_item['classes'] = self::get_menu_item_classes( absint( $item->ID ) );
             $updated_item['xfn'] = get_post_meta( absint( $item->ID ), '_menu_item_xfn', true );
             $updated_item['count'] = absint( $count );
