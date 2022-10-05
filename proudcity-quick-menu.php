@@ -385,6 +385,8 @@ if (!class_exists('PC_Quick_Menu')) {
                         'compare' => '=',
                     ),
                 ),
+                'order' => 'ASC',
+                'orderby' => 'menu_order',
             );
 
             $children = get_posts( $args );
