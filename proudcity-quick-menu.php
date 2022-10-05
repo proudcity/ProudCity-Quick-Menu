@@ -646,9 +646,9 @@ if (!class_exists('PC_Quick_Menu')) {
                 $html .= '</div><!-- /.pcq-item-title-wrap -->';
                 $html .= self::edit_item_form( absint( $setup_item['db_id'] ), $setup_item );
 
-                if ( self::menu_item_has_children( $setup_item['db_id'] ) ){
+                if ( self::menu_item_has_children( absint( $setup_item['db_id'] ) ) ){
                     // I may need to return an array with $html and $count values updated
-                    $html .= self::get_child_menu( $setup_item['db_id'], $count );
+                    $html .= self::get_child_menu( absint( $setup_item['db_id'] ), absint( $count ) );
                 }
 
             $html .= '</li>';
