@@ -233,7 +233,7 @@ jQuery(document).ready(function($) {
 
         e.preventDefault();
 
-        var menuParentWrap = $(this).parents('.pc_quick_menu_item');
+        var menuParentWrap = $(this).closest('.pc_quick_menu_item');
         var parentItem = $(this).parent('.pcq-edit-item-form');
         var editSpinner = $(parentItem).find('.spinner');
         var editPostId = $(parentItem).find('.pcq-edit-item-button').data('menu-item-object-id');
