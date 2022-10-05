@@ -241,8 +241,6 @@ if (!class_exists('PC_Quick_Menu')) {
          * @param   int         $parent_id      required            ID of the parent menu item
          * @param   int         $count          required            The menu position of the item
          * @uses    self::get_child_menu_items()                    Returns objects for child items
-         * @uses    self::menu_item_has_children()                  True if menu item has children
-         * @uses    self::get_child_menu()                          Returns HTML for built child menu
          * @return  string      $html                               Built out child menu items
          */
         private static function get_child_menu( $parent_id, $count ){
