@@ -194,7 +194,11 @@ if (!class_exists('PC_Quick_Menu')) {
 
                         // sets the id of the nav menu item so we can use it to delete the item if we change menus
                         $nav_menu_item = ( true === $in_menu ) ? absint( $item->db_id ) : '';
-                        $html .= self::get_single_item( $item, $current_item, $count );
+
+                        // if this is a child item it gets caught in the get_single_item call
+                        if ( ! self::is_item_a_child_item( $item ) ){
+                            $html .= self::get_single_item( $item, $current_item, $count );
+                        }
 
                         $count++;
 
@@ -249,12 +253,11 @@ if (!class_exists('PC_Quick_Menu')) {
 
             $html .= '<ol class="dd-list pc_quick_menu_item_position">';
                 foreach( $child_items as $item ){
+
                     $current_item = null;
 
                     $html .=  self::get_single_item( $item, $current_item, $count );
-                    if ( self::menu_item_has_children( $item->ID ) ){
-                        $html .= self::get_child_menu( absint( $item->ID ), $count );
-                    }
+
                 }
             $html .= '</ol>';
 
@@ -287,7 +290,7 @@ if (!class_exists('PC_Quick_Menu')) {
             $updated_item['page'] = ''; // @todo figure this out
             $updated_item['menu_item_parent'] = absint( $item->menu_item_parent );
             $updated_item['type'] = esc_attr( get_post_meta( absint( $item->ID ), '_menu_item_type', true ) );
-            $updated_item['title'] = self::get_item_title( $item->title, $updated_item['object_id'] );
+            $updated_item['title'] = self::get_item_title( $item->title, $object_id );
             $updated_item['url'] = esc_url( $item->url );
             $updated_item['description'] = esc_attr( $item->description );
             $updated_item['attr_title'] = esc_attr( $item->attr_title );
