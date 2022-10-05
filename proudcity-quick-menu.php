@@ -176,7 +176,6 @@ if (!class_exists('PC_Quick_Menu')) {
             check_ajax_referer( 'pc_quick_menu_nonce', 'security' );
 
             $html = '';
-            $count = 0;
             $menu_items = wp_get_nav_menu_items(
                 absint( $_POST['selected_menu'] )
             );
@@ -186,8 +185,8 @@ if (!class_exists('PC_Quick_Menu')) {
             // if we changed the menu the item was assigned to then this will delete the old item entry in the menu
             self::maybe_remove_old_menu_entry( $_POST['old_menu_item'] );
 
-            $html .= '<div class="pc-sortable-menu">';
-                $html .= '<ol class="pc_quick_menu_item_position">';
+            $html .= '<div class="pc-sortable-menu dd">';
+                $html .= '<ol class="pc_quick_menu_item_position dd-list">';
                     foreach( $menu_items as $item ){
                         $current_item = absint( $item->object_id ) == absint( $_POST['current_post_id'] ) ? 'current-menu-item' : '';
                         $in_menu = self::is_item_already_in_menu( $in_menu, absint( $item->object_id ), absint( $_POST['current_post_id'] ) );
@@ -197,19 +196,18 @@ if (!class_exists('PC_Quick_Menu')) {
 
                         // if this is a child item it gets caught in the get_single_item call
                         if ( ! self::is_item_a_child_item( $item ) ){
-                            $html .= self::get_single_item( $item, $current_item, $count );
+                            $html .= '<li class="dd-item"><div class="dd-handle">item</div></li>';
+                            //$html .= self::get_single_item( $item, $current_item );
                         }
-
-                        $count++;
 
                     }
 
                     // false because we are adding our current item to a newly selected menu
                     if ( ! $in_menu ){
 
-                        $nav_menu_item = self::add_new_item_to_menu( absint( $_POST['current_post_id'] ), $_POST['selected_menu'], $count );
+                        $nav_menu_item = self::add_new_item_to_menu( absint( $_POST['current_post_id'] ), $_POST['selected_menu'], absint( $menu_order ) );
 
-                        $html .= self::get_current_item( absint( $_POST['current_post_id'] ), absint( $count ), absint( $nav_menu_item ) );
+                        $html .= self::get_current_item( absint( $_POST['current_post_id'] ), absint( $nav_menu_item ) );
                     }
                 $html .= '</ol>';
             $html .= '</div><!-- /.pc-sortable-menu -->';
@@ -243,7 +241,7 @@ if (!class_exists('PC_Quick_Menu')) {
          * @uses    self::get_child_menu_items()                    Returns objects for child items
          * @return  string      $html                               Built out child menu items
          */
-        private static function get_child_menu( $parent_id, $count ){
+        private static function get_child_menu( $parent_id ){
 
             $html = '';
 
@@ -254,7 +252,7 @@ if (!class_exists('PC_Quick_Menu')) {
 
                     $current_item = null;
 
-                    $html .=  self::get_single_item( $item, $current_item, $count );
+                    $html .=  self::get_single_item( $item, $current_item );
 
                 }
             $html .= '</ol>';
@@ -271,13 +269,12 @@ if (!class_exists('PC_Quick_Menu')) {
          * @access private
          *
          * @param   object      $item           required            The object we want to get data out of
-         * @param   ??          $count                              Not even sure we need this
          * @uses    absint()                                        No negative numbers
          * @uses    self::set_object_id()                           Returns the proper object_id after dealing with our 2 data types
          * @uses    self::get_item_title()                          Determines the title of the item
          * @return  array       $updated_items                      The array of items that are updated depending on the data recieved
          */
-        private static function setup_item_data( $item, $count ){
+        private static function setup_item_data( $item ){
 
             $updated_item = array();
 
@@ -448,7 +445,7 @@ if (!class_exists('PC_Quick_Menu')) {
          *
          * @param   int         $post_id        required            ID of the CPT item we're adding to the menu
          * @param   int         $menu_id        required            ID of the menu we're adding to
-         * @param   int         $count          required            Corresponds to the order of the item in the menu
+         * @param   int         $menu_order     required            Corresponds to the order of the item in the menu
          * @uses    get_the_title()                                 Returns the title of a post given $post_id
          * @uses    absint()                                        no negative numbers
          * @uses    wp_insert_post()                                Adds a post to the WP database
@@ -459,14 +456,14 @@ if (!class_exists('PC_Quick_Menu')) {
          * @uses    get_post_type()                                 Returns the post type of the object provide
          * @return  int         $nav_menu_item                      ID of the newly create nav_menu item
          */
-        private static function add_new_item_to_menu( $post_id, $menu_id, $count ){
+        private static function add_new_item_to_menu( $post_id, $menu_id, $menu_order ){
 
                 $post_args = array(
                     'ID' => 0,
                     'post_title' => get_the_title( absint( $post_id ) ),
                     'post_type' => 'nav_menu_item',
                     'post_status' => 'publish',
-                    'menu_order' => absint( $count ),
+                    'menu_order' => absint( $menu_order ),
                     'post_content' => '',
                 );
 
@@ -622,14 +619,12 @@ if (!class_exists('PC_Quick_Menu')) {
          *
          * @param   object          $item           required            Menu item object
          * @param   string          $current_item   required            adds current-menu-item if we're on the page represented by the menu item
-         * @param   string          $child_depth    required            Adds a class if item is a nested menu
-         * @param   int             $count          required            Menu order
          */
-        private static function get_single_item( $item, $current_item, $count ){
+        private static function get_single_item( $item, $current_item ){
 
             $html = '';
 
-            $setup_item = self::setup_item_data( $item, $count );
+            $setup_item = self::setup_item_data( $item );
 
             $html .= '<li ';
                 $html .= 'class="pc_quick_menu_item dd-item' . sanitize_html_class( $current_item ) .'"';
@@ -645,9 +640,10 @@ if (!class_exists('PC_Quick_Menu')) {
                 $html .= 'data-menu-item-target="'. esc_attr( $setup_item['target'] ) .'" ';
                 $html .= 'data-menu-item-classes="'. esc_attr( $setup_item['classes'] ) .'" ';
                 $html .= 'data-menu-item-xfn="'. esc_attr( $setup_item['xfn'] ) .'" ';
+                $html .= 'data-id="'. absint( $setup_item['menu_order'] ) .'" ';
                 $html .= 'data-menu-item-menu-order="'. absint( $setup_item['menu_order'] ) .'">';
                 $html .= '<div class="pcq-item-title-wrap">';
-                    $html .= '<span class="pcq-title-wrap">'. esc_attr( $setup_item['title'] ) .'</span>';
+                    $html .= '<span class="pcq-title-wrap dd-handle">'. esc_attr( $setup_item['title'] ) .'</span>';
                     $html .= '<div class="pcq-action-wrapper">';
                         $html .= '<span title="Delete Item" class="pcq_delete_item dashicons dashicons-trash"></span>';
                         $html .= '<span title="Edit Item" class="pcq_edit_item dashicons dashicons-admin-tools"></span>';
@@ -657,7 +653,7 @@ if (!class_exists('PC_Quick_Menu')) {
 
                 if ( self::menu_item_has_children( absint( $setup_item['db_id'] ) ) ){
                     // I may need to return an array with $html and $count values updated
-                    $html .= self::get_child_menu( absint( $setup_item['db_id'] ), absint( $count ) );
+                    $html .= self::get_child_menu( absint( $setup_item['db_id'] ) );
                 }
 
             $html .= '</li>';
@@ -677,7 +673,7 @@ if (!class_exists('PC_Quick_Menu')) {
          * @uses    int         $order          required                    The menu order of the item currently
          * @uses    int         $db_id          required                    ID of the time in the database (because nav menu items are their own posts)
          */
-        public static function get_current_item( $post_id, $order, $db_id ){
+        public static function get_current_item( $post_id, $db_id ){
 
             $html = '';
 
@@ -686,7 +682,7 @@ if (!class_exists('PC_Quick_Menu')) {
             $html .= '<li class="pc_quick_menu_item current-menu-item" ';
                 $html .= 'data-menu-item-object-id="'. absint( $post_id ) .'" ';
                 $html .= 'data-menu-item-db-id="' . absint( $db_id ) .'" ';
-                $html .= 'data-menu-item-position="'. absint( $order ) .'">';
+                $html .= 'data-menu-item-menu-order="nope">';
                 $html .= '<div class="pcq-item-title-wrap">';
                     $html .= '<span class="pcq-title-wrap">'. esc_attr( $title ) .'</span>';
                     $html .= '<div class="pcq-action-wrapper">';
@@ -712,8 +708,11 @@ if (!class_exists('PC_Quick_Menu')) {
             if ( in_array( $screen->id, $allowed_post_types ) ){
                 wp_enqueue_style('wp_quick_menu_style', plugins_url('css/style.css', __FILE__));
 
+                // nestable
+                wp_enqueue_script( 'pc_nestable', plugins_url( '/proudcity-quick-menu/js/nestable/jquery.nestable.js' ), array( 'jquery'), '1.2', true );
+
                 // scripts plugin
-                wp_enqueue_script('pc_quick_menu_scripts', plugins_url( '/proudcity-quick-menu/js/script.js' ), array('jquery'), '1.2', true);
+                wp_enqueue_script('pc_quick_menu_scripts', plugins_url( '/proudcity-quick-menu/js/script.js' ), array('jquery', 'pc_nestable'), '1.2', true);
                 wp_localize_script( 'pc_quick_menu_scripts', 'PCQuickMenuScripts', array(
                     'ajaxurl'           => admin_url( 'admin-ajax.php' ),
                     'pc_quick_menu_nonce' => wp_create_nonce( 'pc_quick_menu_nonce' ),

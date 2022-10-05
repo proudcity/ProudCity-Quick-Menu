@@ -56,75 +56,12 @@ jQuery(document).ready(function($) {
                     $(menuPositionSelect).empty().append( response.data.value );
 
                     // making our menu items sortable
-                    $('.pc_quick_menu_item_position').sortable({
-                        placeholder: "pc-quick-drop-target",
-                        start: function( event, ui){
-                            ui.item.data('item_order', ui.item.index());
-                        },
-                        stop: function( event, ui ){
-                            var start = ui.item.data('item_order');
-                            if ( start != ui.item.index()){
-                                //console.log('moved');
-                            } else {
-                                // the update function runs before stop so it may log as
-                                // not moved once the elements are updated
-                                //console.log('not moved');
-                            }
-
-                        },
-                        update: function( event, ui ){
-                            // get menu being update
-                            var menuToUpdate = $(menuSelect).find(':selected').val();
-
-                            // build array of menu items for saving
-                            var updatedItems = [];
-                            $(this).children('li').each(function(index){
-
-                                //first we need to update the position index
-                               $(this).attr('data-menu-item-position', index);
-
-                               var menuItemDbId = $(this).data('menu-item-db-id');
-                               var menuItemObjectId = $(this).data('menu-item-object-id');
-                               var menuItemObject = $(this).data('menu-item-object');
-                               var menuItemParentId = $(this).data('menu-item-parent-id');
-                               var menuItemType = $(this).data('menu-item-type');
-                               var menuItemTitle = $(this).data('menu-item-title');
-                               var menuItemUrl = $(this).data('menu-item-url');
-                               var menuItemDescription = $(this).data('menu-item-description');
-                               var menuItemAttrTitle = $(this).data('menu-item-attr-title');
-                               var menuItemTarget = $(this).data('menu-item-target');
-                               var menuItemClasses = $(this).data('menu-item-classes');
-                               var menuItemXfn = $(this).data('menu-item-xfn');
-                               var menuItemOrder = $(this).data('menu-item-menu-order');
-
-                               updatedItems.push({
-                                'menu-item-db-id': menuItemDbId,
-                                'menu-item-object-id': menuItemObjectId,
-                                'menu-item-object': menuItemObject,
-                                'menu-item-parent-id': menuItemParentId,
-                                'menu-item-type': menuItemType,
-                                'menu-item-title': menuItemTitle,
-                                'menu-item-url': menuItemUrl,
-                                'menu-item-description': menuItemDescription,
-                                'menu-item-attr-title': menuItemAttrTitle,
-                                'menu-item-target': menuItemTarget,
-                                'menu-item-classes': menuItemClasses,
-                                'menu-item-xfn': menuItemXfn,
-                                'menu-item-menu-order': menuItemOrder
-                               });
-
-                            });
-
-                            // after we've looped through the items we need to do the ajax thing to update them
-                            pcq_save_updated_menu_items( menuToUpdate, updatedItems, spinner );
-
-                        }
+                    $('.dd').nestable({
+                        expandBtnHTML: '',
+                        collapseBtnHTML: '',
+                        maxDepth: 3
                     });
-                    $('.pc_quick_menu_item_position').disableSelection();
 
-                    // making sure we default the current menu item to open
-                    var currentItem = $('.pc_quick_menu_wrapper').find('.current-menu-item');
-                    $(currentItem).find('.pcq-edit-item-form').slideDown();
 
                 } // yup
 
