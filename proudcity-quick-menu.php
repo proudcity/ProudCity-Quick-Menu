@@ -288,7 +288,7 @@ if (!class_exists('PC_Quick_Menu')) {
             $updated_item['page'] = ''; // @todo figure this out
             $updated_item['menu_item_parent'] = absint( $item->menu_item_parent );
             $updated_item['type'] = esc_attr( get_post_meta( absint( $item->ID ), '_menu_item_type', true ) );
-            $updated_item['title'] = self::get_item_title( $item->title, $object_id );
+            $updated_item['title'] = self::get_item_title( esc_attr( $item->title ), absint( $item->ID ), absint( $object_id ) );
             $updated_item['url'] = esc_url( $item->url );
             $updated_item['description'] = esc_attr( $item->description );
             $updated_item['attr_title'] = esc_attr( $item->attr_title );
@@ -340,16 +340,23 @@ if (!class_exists('PC_Quick_Menu')) {
          * @access private
          *
          * @param   string      $item_title         required            Default title setting which may be empty
-         * @param   int         $item_id            required            ID of the item we want to get a title for
+         * @param   int         $nav_menu_id        required            post_id for the nav_menu_item
+         * @param   int         $linked_parent_id   required            ID of the content that the nav_menu_item is linking to
          * @uses    get_the_title()                                     Returns post title given post_id
+         * @uses    absint()                                            No negative numbers
          * @return  string      $title                                  The title we have worked out
          */
-        private static function get_item_title( $item_title, $item_id ){
+        private static function get_item_title( $item_title, $nav_menu_id, $linked_parent_id ){
 
             if ( isset( $item_title ) && ! empty( $item_title ) ){
                 $title = $item_title;
             } else {
-                $title = get_the_title( absint( $item_id ) );
+                $title = get_the_title( absint( $nav_menu_id ) );
+
+                // nav_menu_item didn't have title so we get title from page that the nav_menu_item is linking to
+                if ( !isset( $title ) || empty( $title ) ){
+                    $title = get_the_title( absint( $linked_parent_id ) );
+                }
             }
 
             return esc_attr( $title );
