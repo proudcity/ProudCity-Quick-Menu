@@ -47,6 +47,7 @@ ol.pc_quick_menu_item_position:first-of-type{
 
 .pcq-action-wrapper{
     width:25%;
+    margin-top:5px; margin-right:2px;
     display:block;
     float:right;
 }
