@@ -62,6 +62,8 @@ jQuery(document).ready(function($) {
                         maxDepth: 3
                     });
 
+                    // making sure that the current item edit form is visible
+                    $('.current-menu-item').find('.pcq-edit-item-form').slideDown();
 
                 } // yup
 

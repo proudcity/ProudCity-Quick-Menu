@@ -196,8 +196,8 @@ if (!class_exists('PC_Quick_Menu')) {
 
                         // if this is a child item it gets caught in the get_single_item call
                         if ( ! self::is_item_a_child_item( $item ) ){
-                            $html .= '<li class="dd-item"><div class="dd-handle">item</div></li>';
-                            //$html .= self::get_single_item( $item, $current_item );
+                            //$html .= '<li class="dd-item"><div class="dd-handle">item</div></li>';
+                            $html .= self::get_single_item( $item, $current_item );
                         }
 
                     }
@@ -627,7 +627,7 @@ if (!class_exists('PC_Quick_Menu')) {
             $setup_item = self::setup_item_data( $item );
 
             $html .= '<li ';
-                $html .= 'class="pc_quick_menu_item dd-item' . sanitize_html_class( $current_item ) .'"';
+                $html .= 'class="pc_quick_menu_item dd-item ' . sanitize_html_class( $current_item ) .'"';
                 $html .= 'data-menu-item-db-id="'. absint( $setup_item['db_id'] ) .'" ';
                 $html .= 'data-menu-item-object-id="'. absint( $setup_item['object_id'] ) .'" ';
                 $html .= 'data-menu-item-object="'. esc_attr( $setup_item['page'] ) .'" ';
