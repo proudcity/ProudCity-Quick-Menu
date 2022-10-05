@@ -295,7 +295,7 @@ if (!class_exists('PC_Quick_Menu')) {
             $updated_item['target'] = esc_attr( get_post_meta( absint( $item->ID ), '_menu_item_target', true ) );
             $updated_item['classes'] = self::get_menu_item_classes( absint( $item->ID ) );
             $updated_item['xfn'] = get_post_meta( absint( $item->ID ), '_menu_item_xfn', true );
-            $updated_item['count'] = absint( $count );
+            $updated_item['menu_order'] = get_post_field( 'menu_order', absint( $item->ID ) );
 
             return (array) $updated_item;
 
@@ -645,7 +645,7 @@ if (!class_exists('PC_Quick_Menu')) {
                 $html .= 'data-menu-item-target="'. esc_attr( $setup_item['target'] ) .'" ';
                 $html .= 'data-menu-item-classes="'. esc_attr( $setup_item['classes'] ) .'" ';
                 $html .= 'data-menu-item-xfn="'. esc_attr( $setup_item['xfn'] ) .'" ';
-                $html .= 'data-menu-item-position="'. absint( $setup_item['count'] ) .'">';
+                $html .= 'data-menu-item-menu-order="'. absint( $setup_item['menu_order'] ) .'">';
                 $html .= '<div class="pcq-item-title-wrap">';
                     $html .= '<span class="pcq-title-wrap">'. esc_attr( $setup_item['title'] ) .'</span>';
                     $html .= '<div class="pcq-action-wrapper">';
