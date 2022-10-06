@@ -32,7 +32,7 @@ ol.pc_quick_menu_item_position:first-of-type{
 }
 
 .pc_quick_menu_item{
-    padding:5px 5px;
+    padding:0;
     margin:7px 5px;
     border:1px solid #ccc;
     border-radius:3px;
