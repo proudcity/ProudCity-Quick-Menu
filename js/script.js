@@ -116,14 +116,14 @@ jQuery(document).ready(function($) {
         // show spinner
         $(spinner).css('visibility', 'visible' );
 
-        var parentItem = $(this).parent('.pc_quick_menu_item');
-        var postId = $(parentItem).data('menu-item-db-id');
-        var deletePostId = $(parentItem).data('menu-item-object-id');
+        var parentItem = $(this).closest('.pc_quick_menu_item');
+        var postID = $(parentItem).data('menu-item-db-id');
+        var deletePostID = $(parentItem).data('menu-item-object-id');
         var currentPostID = $('#post_ID').val();
 
         var data = {
             'action': 'pcq_delete_menu_item',
-            'post_id': postId,
+            'post_id': postID,
             'security': PCQuickMenuScripts.pc_quick_menu_nonce
         }
 
@@ -136,7 +136,7 @@ jQuery(document).ready(function($) {
                     $('#pcq_feedback_message').empty().show().append(response.data.message).delay(1500).fadeOut();
 
                     // if we are removing this item from the menu then we need to reset the menu
-                    if ( currentPostID == deletePostId ){
+                    if ( currentPostID == deletePostID ){
                         $('.pc_quick_menu_position').fadeOut(500).delay(500).empty();
                         $(menuSelect).prop('selectedIndex', 0 );
                     } else {
