@@ -285,7 +285,7 @@ if (!class_exists('PC_Quick_Menu')) {
             $updated_item['db_id'] = absint( $item->ID );
             $updated_item['object_id'] = absint( $object_id );
             $updated_item['page'] = ''; // @todo figure this out
-            $updated_item['menu_item_parent'] = absint( $item->menu_item_parent );
+            $updated_item['menu_item_parent'] = absint( get_post_meta( absint( $item->ID ), '_menu_item_menu_item_parent', true ) );
             $updated_item['type'] = esc_attr( get_post_meta( absint( $item->ID ), '_menu_item_type', true ) );
             $updated_item['title'] = self::get_item_title( esc_attr( $item->title ), absint( $item->ID ), absint( $object_id ) );
             $updated_item['url'] = esc_url( $item->url );

@@ -59,7 +59,20 @@ jQuery(document).ready(function($) {
                     $('.dd').nestable({
                         expandBtnHTML: '',
                         collapseBtnHTML: '',
+                        serialize: true,
                         maxDepth: 3
+                    }).on('change', function(){
+
+                        var childses = $(this).find('li');
+                        pcq_update_menu_order( childses );
+                        pcq_set_parent_ids( childses );
+
+                        // serialize the data AFTER we have updated the menu_order properties
+                        var serializedMenuData = $(this).nestable('serialize');
+                        var menuToUpdate = $('#wp_quick_nav_menu').val();
+
+                        pcq_save_updated_menu_items( menuToUpdate, serializedMenuData, spinner );
+                        // need to send all that information to pcq_save_updated_menu_items
                     });
 
                     // making sure that the current item edit form is visible
@@ -74,6 +87,33 @@ jQuery(document).ready(function($) {
             }); // end ajax post
 
 
+    }
+
+    /**
+     * Sets the parent_ids for menus
+     */
+    function pcq_set_parent_ids( childses ){
+
+        $(childses).each( function(){
+            if( $(this).closest('.dd-item').length){
+                var parentItem = $(this).closest('.dd-item');
+                var parentID = $(parentItem).data('menu-item-db-id');
+                $(this).attr( 'data-menu-item-parent-id', parentID );
+            }
+        });
+
+    }
+
+    /**
+     * Updates the data attribute we use to detect menu_order
+     *
+     * @param {array} childses
+     */
+    function pcq_update_menu_order( childses ){
+
+        $(childses).each( function( index, value ){
+            $(this).attr('data-menu-item-menu-order', index + 1 );
+        });
     }
 
     /**
