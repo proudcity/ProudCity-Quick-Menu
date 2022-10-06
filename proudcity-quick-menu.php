@@ -185,6 +185,8 @@ if (!class_exists('PC_Quick_Menu')) {
             // if we changed the menu the item was assigned to then this will delete the old item entry in the menu
             self::maybe_remove_old_menu_entry( $_POST['old_menu_item'] );
 
+            $menu_order = count( $menu_items );
+
             $html .= '<div class="pc-sortable-menu dd">';
                 $html .= '<ol class="pc_quick_menu_item_position dd-list">';
                     foreach( $menu_items as $item ){
