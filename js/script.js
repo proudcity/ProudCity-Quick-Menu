@@ -63,6 +63,7 @@ jQuery(document).ready(function($) {
                         maxDepth: 3
                     }).on('change', function(){
 
+                        // here `this` refers to the main mune that has nestable applied to it
                         var childses = $(this).find('li');
                         pcq_update_menu_order( childses );
                         pcq_set_parent_ids( childses );
@@ -96,9 +97,16 @@ jQuery(document).ready(function($) {
 
         $(childses).each( function(){
             if( $(this).closest('.dd-item').length){
-                var parentItem = $(this).closest('.dd-item');
+                $(this).closest('.dd-item').addClass('parent');
+                var parentItem = $(this).parent().closest('.dd-item');
+                var currentItemID = $(this).data('menu-item-db-id');
                 var parentID = $(parentItem).data('menu-item-db-id');
-                $(this).attr( 'data-menu-item-parent-id', parentID );
+                //console.log( 'currentID ' + currentItemID );
+                //console.log( 'parentID ' + parentID );
+
+                if ( currentItemID != parentID ){
+                    $(this).attr( 'data-menu-item-parent-id', parentID );
+                }
             }
         });
 
