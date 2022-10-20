@@ -144,10 +144,12 @@ if (!class_exists('PC_Quick_Menu')) {
                 if ( ! in_array( WP_ERROR, $updated ) ){
                     $saved = true;
                 }
+                */
 
             } // foreach
 
-            if ( ! empty( $saved ) ){
+
+            if ( isset( $saved ) && ! empty( $saved ) ){
                 $success = true;
                 $message = 'Menu Updated';
             } else {
