@@ -133,21 +133,23 @@ if (!class_exists('PC_Quick_Menu')) {
             $updated = array();
 
             foreach( $_POST['menu-items'] as $item ){
-                $update_args = array(
-                    'ID' => absint( $item['menu-item-db-id'] ),
-                    'menu_order' => intval( $item['menu-item-position'] ),
-                    'post_excerpt' => 'nope',
-                );
 
-                $updated[] = wp_update_post( $update_args );
+                // if something has a child I need to check it and save the sub-items
+                // if any sub-item has children I need to check that and do a recursive save thing
 
-                if ( ! in_array( WP_ERROR, $updated ) ){
+                if ( isset( $item['children'] ) ){
+                    $updated[] = self::sort_child_items( $item );
+                } else {
+                    update_option( 'sfn_parent', $item['menuItemParentId'] );
+                    // set the args and update the menu item
+                    $updated[] = self::set_and_save_menu_item( $item );
+                }
+
+                if ( ! in_array( false, $updated ) ){
                     $saved = true;
                 }
-                */
 
             } // foreach
-
 
             if ( isset( $saved ) && ! empty( $saved ) ){
                 $success = true;
@@ -163,6 +165,80 @@ if (!class_exists('PC_Quick_Menu')) {
             );
 
             wp_send_json_success( $data );
+
+        } // update_menu_items
+
+        /**
+         * Checks for children recursively
+         *
+         * @since 2022.10.20
+         * @author Curtis
+         * @access private
+         *
+         * @param   array       $item               required                The item we're checking for children
+         * @uses    self::sort_child_items()                                figures out if something has children recursively
+         * @uses    self::set_and_save_menu_item()                          saves the menu item
+         * @return  array       $updated                                    array to check later for no WP_Error objects
+         */
+        private static function sort_child_items( $item ){
+
+            $updated = array();
+
+            if ( isset( $item['children'] ) ){
+
+                if ( $item['menuItemDbId'] == 8356 ){
+                    update_option( 'sfn_test', $item );
+                }
+
+                foreach( $item['children'] as $child ){
+                    self::sort_child_items( $child );
+                }
+            } else {
+
+                if ( $item['menuItemDbId'] == 8359 ){
+                    update_option( 'sfn_child', $item );
+                    update_option( 'sfn_time', time() );
+                }
+
+                $updated[] = self::set_and_save_menu_item( $item );
+            }
+
+            return (array) $updated;
+
+        } // sort_child_items
+
+        /**
+         * Sets the variables so that we can update menu items
+         *
+         * @since 2022.10.20
+         * @author Curtis
+         * @access private
+         *
+         * @param   array           $item           required            Array of menu item arguments
+         * @uses    absint()                                            Negative numbers not allowed
+         * @uses    wp_update_post()                                    Updates post given post_id and args
+         * @uses    update_post_meta()                                  Updates post meta given post_id and key
+         * @
+         */
+        private static function set_and_save_menu_item( $item ){
+
+            $update_args = array(
+                'ID' => absint( $item['menuItemDbId'] ),
+                'menu_order' => intval( $item['menuItemMenuOrder'] ),
+            );
+
+            $updated = wp_update_post( $update_args );
+
+            if ( isset( $item['menuItemParentId'] ) && 0 !== $item['menuItemParentId'] ){
+                update_post_meta( absint( $item['menuItemDbId'] ), '_menu_item_menu_item_parent', absint( $item['menuItemParentId'] ) );
+            }
+
+            if ( is_wp_error( $updated ) ){
+                $updated = false;
+            }
+
+            return $updated;
+
         }
 
         /**
@@ -716,7 +792,7 @@ if (!class_exists('PC_Quick_Menu')) {
                 wp_enqueue_script( 'pc_nestable', plugins_url( '/proudcity-quick-menu/js/nestable/jquery.nestable.js' ), array( 'jquery'), '1.2', true );
 
                 // scripts plugin
-                wp_enqueue_script('pc_quick_menu_scripts', plugins_url( '/proudcity-quick-menu/js/script.js' ), array('jquery', 'pc_nestable'), '1.2', true);
+                wp_enqueue_script('pc_quick_menu_scripts', plugins_url( '/proudcity-quick-menu/js/pc-quick-menu-script.js' ), array('jquery', 'pc_nestable'), '1.2', true);
                 wp_localize_script( 'pc_quick_menu_scripts', 'PCQuickMenuScripts', array(
                     'ajaxurl'           => admin_url( 'admin-ajax.php' ),
                     'pc_quick_menu_nonce' => wp_create_nonce( 'pc_quick_menu_nonce' ),
