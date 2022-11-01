@@ -97,7 +97,10 @@ ol.pc_quick_menu_item_position:first-of-type{
              border-radius: 3px;
      box-sizing: border-box; -moz-box-sizing: border-box;
  }
- .dd-handle:hover { color: #2ea8e5; background: #fff; }
+ .dd-handle:hover { color: white; background: #0071bc; }
+ .current-menu-item .dd-handle:hover{
+    color:black;
+ }
 
 
  .current-menu-item .dd-handle{color:white;}
