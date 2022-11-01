@@ -170,6 +170,11 @@ jQuery(document).ready(function($) {
                 if ( currentItemID != parentID ){
                     $(this).attr( 'data-menu-item-parent-id', parentID );
                 }
+
+                // removed parentID if we are not a child menu
+                if ( typeof parentID === "undefined" ){
+                    $(this).attr( 'data-menu-item-parent-id', '' );
+                }
             }
         });
 
