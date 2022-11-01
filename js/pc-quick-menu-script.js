@@ -73,20 +73,17 @@ jQuery(document).ready(function($) {
                         pcq_set_parent_ids( childses );
 
                         $.wait( function(){
-                        // serialize the data AFTER we have updated the menu_order properties
-                        // @todo the issue is that it's serializing the "old" data so it's not updated
-                        //      though the first time we serialize it's correct, it's the second time we serialize that we have issues
-                        var serializedMenuData = null;
-                        console.log( 'serializing now '+ serializedMenuData );
-                        var serializedMenuData = pcq_setup_menu_data( menu ); // $(menu).nestable('serialize');
-                        console.log('serialized');
-                        var menuToUpdate = $('#wp_quick_nav_menu').val();
+                            // serialize the data AFTER we have updated the menu_order properties
+                            var serializedMenuData = null;
+                            var serializedMenuData = pcq_setup_menu_data( menu ); // $(menu).nestable('serialize');
+                            var menuToUpdate = $('#wp_quick_nav_menu').val();
 
-                        console.log( serializedMenuData );
+                            console.log( serializedMenuData);
 
-                        pcq_save_updated_menu_items( menuToUpdate, serializedMenuData, spinner );
-                        // need to send all that information to pcq_save_updated_menu_items
-                        }, 2);
+                            pcq_save_updated_menu_items( menuToUpdate, serializedMenuData, spinner );
+                            // need to send all that information to pcq_save_updated_menu_items
+                        }, 1);
+
 
                     });
 
@@ -117,6 +114,8 @@ jQuery(document).ready(function($) {
         var setupMenuData = [];
 
         $(menu).find( 'li' ).each( function( index ){
+
+            $(this).removeData();
 
             var menuItemDbId = $(this).data('menu-item-db-id');
             var menuItemObjectId = $(this).data('menu-item-object-id');
