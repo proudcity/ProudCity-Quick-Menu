@@ -757,19 +757,22 @@ if (!class_exists('PC_Quick_Menu')) {
 
             $html = '';
 
+            $setup_item = self::setup_item_data( get_post( $db_id ) );
+
             $title = empty( get_post_field( 'title', absint( $post_id ) ) ) ? get_post_field( 'post_title', absint( $post_id ) ) : get_post_field( 'title', absint( $post_id ) );
 
-            $html .= '<li class="pc_quick_menu_item current-menu-item" ';
+            $html .= '<li class="pc_quick_menu_item current-menu-item dd-item" ';
                 $html .= 'data-menu-item-object-id="'. absint( $post_id ) .'" ';
                 $html .= 'data-menu-item-db-id="' . absint( $db_id ) .'" ';
                 $html .= 'data-menu-item-menu-order="nope">';
                 $html .= '<div class="pcq-item-title-wrap">';
-                    $html .= '<span class="pcq-title-wrap">'. esc_attr( $title ) .'</span>';
+                    $html .= '<span class="pcq-title-wrap dd-handle">'. esc_attr( $title ) .'</span>';
                     $html .= '<div class="pcq-action-wrapper">';
                         $html .= '<span title="Delete Item" class="pcq_delete_item dashicons dashicons-trash"></span>';
                         $html .= '<span title="Edit Item" class="pcq_edit_item dashicons dashicons-admin-tools"></span>';
                     $html .= '</div>';
                 $html .= '</div><!-- /.pcq-item-title-wrap -->';
+                $html .= self::edit_item_form( absint( $setup_item['db_id'] ), $setup_item );
             $html .= '</li>';
 
             return $html;
