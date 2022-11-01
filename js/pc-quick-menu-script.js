@@ -64,18 +64,20 @@ jQuery(document).ready(function($) {
                     }).on('change', function(){
 
                         // need to define menu because inside the promise this becomes the whole window
-                        var menu = $(this);
+                        var menu = null
+                        var menu = $('.dd');
 
                         // here `this` refers to the main mune that has nestable applied to it
                         var childses = $(menu).find('li');
                         pcq_update_menu_order( childses );
                         pcq_set_parent_ids( childses );
 
+                        $.wait( function(){
                         // serialize the data AFTER we have updated the menu_order properties
                         // @todo the issue is that it's serializing the "old" data so it's not updated
                         //      though the first time we serialize it's correct, it's the second time we serialize that we have issues
                         var serializedMenuData = null;
-                        console.log( 'serializing now' );
+                        console.log( 'serializing now '+ serializedMenuData );
                         var serializedMenuData = pcq_setup_menu_data( menu ); // $(menu).nestable('serialize');
                         console.log('serialized');
                         var menuToUpdate = $('#wp_quick_nav_menu').val();
@@ -84,6 +86,7 @@ jQuery(document).ready(function($) {
 
                         pcq_save_updated_menu_items( menuToUpdate, serializedMenuData, spinner );
                         // need to send all that information to pcq_save_updated_menu_items
+                        }, 2);
 
                     });
 
@@ -156,8 +159,6 @@ jQuery(document).ready(function($) {
      */
     function pcq_set_parent_ids( childses ){
 
-        return new Promise((resolve) => {
-
         $(childses).each( function(){
             if( $(this).closest('.dd-item').length){
                 $(this).closest('.dd-item').addClass('parent');
@@ -173,10 +174,6 @@ jQuery(document).ready(function($) {
             }
         });
 
-        resolve();
-
-        });
-
     }
 
     /**
@@ -186,13 +183,11 @@ jQuery(document).ready(function($) {
      */
     function pcq_update_menu_order( childses ){
 
-        return new Promise((resolve) => {
             console.log( 'updating order' );
 
             $(childses).each( function( index, value ){
                 $(this).attr('data-menu-item-menu-order', index + 1 );
             });
-        resolve();
     }
 
     /**
