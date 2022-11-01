@@ -78,7 +78,7 @@ jQuery(document).ready(function($) {
                             var serializedMenuData = pcq_setup_menu_data( menu ); // $(menu).nestable('serialize');
                             var menuToUpdate = $('#wp_quick_nav_menu').val();
 
-                            console.log( serializedMenuData);
+                            //console.log( serializedMenuData);
 
                             pcq_save_updated_menu_items( menuToUpdate, serializedMenuData, spinner );
                             // need to send all that information to pcq_save_updated_menu_items
