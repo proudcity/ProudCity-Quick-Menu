@@ -3,7 +3,7 @@
 /*
   Plugin Name: ProudCity Quick Menu
   Description: Add page/post to menu on create or edit screen
-  Version: 1.2
+  Version: 2022.11.30.0903
   Tested up to: 6.0.0
   Author: proudcity, curtismchale
   Author URI: https://proudcity.com
@@ -140,7 +140,6 @@ if (!class_exists('PC_Quick_Menu')) {
                 if ( isset( $item['children'] ) ){
                     $updated[] = self::sort_child_items( $item );
                 } else {
-                    update_option( 'sfn_parent', $item['menuItemParentId'] );
                     // set the args and update the menu item
                     $updated[] = self::set_and_save_menu_item( $item );
                 }
@@ -186,20 +185,11 @@ if (!class_exists('PC_Quick_Menu')) {
 
             if ( isset( $item['children'] ) ){
 
-                if ( $item['menuItemDbId'] == 8356 ){
-                    update_option( 'sfn_test', $item );
-                }
-
                 foreach( $item['children'] as $child ){
                     self::sort_child_items( $child );
                 }
+
             } else {
-
-                if ( $item['menuItemDbId'] == 8359 ){
-                    update_option( 'sfn_child', $item );
-                    update_option( 'sfn_time', time() );
-                }
-
                 $updated[] = self::set_and_save_menu_item( $item );
             }
 
@@ -680,7 +670,7 @@ if (!class_exists('PC_Quick_Menu')) {
          * @param   int         $current_post_id    required                ID for the current post
          * @return  bool                                                    true if the item is already in the menu
          */
-        private static function is_item_already_in_menu( $in_menu = false, $menu_object_id, $current_post_id ){
+        private static function is_item_already_in_menu( $in_menu = false, $menu_object_id = null, $current_post_id = null){
 
             if ( true == $in_menu ) return (bool) $in_menu;
 
