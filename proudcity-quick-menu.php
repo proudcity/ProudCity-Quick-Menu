@@ -3,7 +3,7 @@
 /*
   Plugin Name: ProudCity Quick Menu
   Description: Add page/post to menu on create or edit screen
-  Version: 1.2
+  Version: 2022.11.02.1326
   Tested up to: 6.0.0
   Author: proudcity, curtismchale
   Author URI: https://proudcity.com
@@ -680,7 +680,7 @@ if (!class_exists('PC_Quick_Menu')) {
          * @param   int         $current_post_id    required                ID for the current post
          * @return  bool                                                    true if the item is already in the menu
          */
-        private static function is_item_already_in_menu( $in_menu = false, $menu_object_id, $current_post_id ){
+        private static function is_item_already_in_menu( $in_menu = false, $menu_object_id = null, $current_post_id = null ){
 
             if ( true == $in_menu ) return (bool) $in_menu;
 
