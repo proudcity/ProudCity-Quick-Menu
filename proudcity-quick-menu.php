@@ -140,7 +140,6 @@ if (!class_exists('PC_Quick_Menu')) {
                 if ( isset( $item['children'] ) ){
                     $updated[] = self::sort_child_items( $item );
                 } else {
-                    update_option( 'sfn_parent', $item['menuItemParentId'] );
                     // set the args and update the menu item
                     $updated[] = self::set_and_save_menu_item( $item );
                 }
@@ -186,20 +185,11 @@ if (!class_exists('PC_Quick_Menu')) {
 
             if ( isset( $item['children'] ) ){
 
-                if ( $item['menuItemDbId'] == 8356 ){
-                    update_option( 'sfn_test', $item );
-                }
-
                 foreach( $item['children'] as $child ){
                     self::sort_child_items( $child );
                 }
+
             } else {
-
-                if ( $item['menuItemDbId'] == 8359 ){
-                    update_option( 'sfn_child', $item );
-                    update_option( 'sfn_time', time() );
-                }
-
                 $updated[] = self::set_and_save_menu_item( $item );
             }
 
