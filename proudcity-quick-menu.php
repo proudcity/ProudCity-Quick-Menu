@@ -3,7 +3,7 @@
 /*
   Plugin Name: ProudCity Quick Menu
   Description: Add page/post to menu on create or edit screen
-  Version: 2023.01.31.0700
+  Version: 2023.02.22.1233
   Tested up to: 6.0.0
   Author: proudcity, curtismchale
   Author URI: https://proudcity.com
@@ -542,7 +542,7 @@ if (!class_exists('PC_Quick_Menu')) {
                 wp_set_object_terms( absint( $nav_menu_item ), absint( $menu_id ), 'nav_menu', false );
 
                 update_post_meta( absint( $nav_menu_item ), '_menu_item_url', esc_url( get_the_permalink( absint( $post_id ) ) ) );
-                update_post_meta( absint( $nav_menu_item ), '_menu_item_target', '_blank' );
+                update_post_meta( absint( $nav_menu_item ), '_menu_item_target', null );
                 update_post_meta( absint( $nav_menu_item ), '_menu_item_classes', array() );
                 update_post_meta( absint( $nav_menu_item ), '_menu_item_xfn', '' );
                 update_post_meta( absint( $nav_menu_item ), '_menu_item_object_id', absint( $post_id ) );
