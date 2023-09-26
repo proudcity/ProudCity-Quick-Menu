@@ -102,9 +102,6 @@ ol.pc_quick_menu_item_position:first-of-type{
     color:black;
  }
 
-
- .current-menu-item .dd-handle{color:white;}
-
  .dd-item > button { display: block; position: relative; cursor: pointer; float: left; width: 25px; height: 20px; margin: 5px 0; padding: 0; text-indent: 100%; white-space: nowrap; overflow: hidden; border: 0; background: transparent; font-size: 12px; line-height: 1; text-align: center; font-weight: bold; }
  .dd-item > button:before { content: '+'; display: block; position: absolute; width: 100%; text-align: center; text-indent: 0; }
  .dd-item > button[data-action="collapse"]:before { content: '-'; }
@@ -192,8 +189,7 @@ ol.pc_quick_menu_item_position:first-of-type{
 }
 
 .pc_quick_menu_item.current-menu-item{
-    background:#0071bc;
-    color:white;
+    background:#d0ecff;
 }
 
 .pc_quick_menu_item.current-menu-item .pcq_delete_item{
@@ -217,10 +213,6 @@ ol.pc_quick_menu_item_position:first-of-type{
 }
 
 .pcq-original{text-decoration:underline;}
-
-.current-menu-item .pcq-original a{
-    color:white;
-}
 
 .current-menu-item .pcq-original a:hover,
 .current-menu-item .pcq-original a:focus{

@@ -3,7 +3,7 @@
 /*
   Plugin Name: ProudCity Quick Menu
   Description: Add page/post to menu on create or edit screen
-  Version: 2023.02.22.1233
+  Version: 2023.09.26.1052
   Tested up to: 6.0.0
   Author: proudcity, curtismchale
   Author URI: https://proudcity.com
@@ -775,17 +775,21 @@ if (!class_exists('PC_Quick_Menu')) {
         function wp_quick_menu_add_css_js() {
 
             $allowed_post_types = apply_filters( 'pcq_allowed_post_types', array( 'post', 'page' ) );
-            $screen = get_current_screen();
+			$screen = get_current_screen();
+
+			$plugin_data = get_plugin_data( __FILE__ );
+
+			$version = $plugin_data['Version'];
 
             // only adding our scripts on specific types that are allowed
             if ( in_array( $screen->id, $allowed_post_types ) ){
-                wp_enqueue_style('wp_quick_menu_style', plugins_url('css/style.css', __FILE__));
+                wp_enqueue_style('wp_quick_menu_style', plugins_url('css/style.css', __FILE__), esc_attr( $version ) );
 
                 // nestable
-                wp_enqueue_script( 'pc_nestable', plugins_url( '/proudcity-quick-menu/js/nestable/jquery.nestable.js' ), array( 'jquery'), '1.2', true );
+                wp_enqueue_script( 'pc_nestable', plugins_url( '/proudcity-quick-menu/js/nestable/jquery.nestable.js' ), array( 'jquery'), esc_attr( $version ), true );
 
                 // scripts plugin
-                wp_enqueue_script('pc_quick_menu_scripts', plugins_url( '/proudcity-quick-menu/js/pc-quick-menu-script.js' ), array('jquery', 'pc_nestable'), '1.2', true);
+                wp_enqueue_script('pc_quick_menu_scripts', plugins_url( '/proudcity-quick-menu/js/pc-quick-menu-script.js' ), array('jquery', 'pc_nestable'), esc_attr( $version ), true);
                 wp_localize_script( 'pc_quick_menu_scripts', 'PCQuickMenuScripts', array(
                     'ajaxurl'           => admin_url( 'admin-ajax.php' ),
                     'pc_quick_menu_nonce' => wp_create_nonce( 'pc_quick_menu_nonce' ),
