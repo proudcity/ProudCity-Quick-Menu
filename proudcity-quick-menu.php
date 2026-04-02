@@ -64,8 +64,8 @@ if (!class_exists('PC_Quick_Menu')) {
             $message = 'The menu item was NOT edited. Please contact a site administrator.';
 
             $update_args = array(
-                'ID' => absint( $_POST['post_id'] ),
-                'post_title' => esc_attr( $_POST['item_title'] ),
+                'ID' => absint($_POST['post_id']),
+                'post_title' => sanitize_text_field($_POST['item_title']),
             );
 
             $updated = wp_update_post( $update_args );
@@ -110,7 +110,7 @@ if (!class_exists('PC_Quick_Menu')) {
             $success = false;
             $message = 'The menu item was NOT deleted. Please contact a site administrator.';
 
-            $deleted = wp_delete_post( absint( $post_id ), true );
+            $deleted = wp_delete_post(absint($post_id), true);
 
             if ( false !== $deleted || null !== $deleted ){
                 $success = true;
@@ -149,6 +149,10 @@ if (!class_exists('PC_Quick_Menu')) {
             }
 
             $updated = array();
+
+            if (! is_array($_POST['menu-items'])){
+                wp_send_json_error('Not a valid menu');
+            }
 
             foreach( $_POST['menu-items'] as $item ){
 
@@ -260,7 +264,8 @@ if (!class_exists('PC_Quick_Menu')) {
          *
          * @uses    wp_get_nav_menu_items()                         Returns the items in a menu
          */
-        public function get_menu_items(){
+        public function get_menu_items()
+        {
             check_ajax_referer('pc_quick_menu_nonce', 'security');
 
             if (! current_user_can('manage_categories')) {
@@ -269,19 +274,19 @@ if (!class_exists('PC_Quick_Menu')) {
 
             $html = '';
             $menu_items = wp_get_nav_menu_items(
-                absint( $_POST['selected_menu'] )
+                absint($_POST['selected_menu'])
             );
 
             $in_menu = false;
 
             // if we changed the menu the item was assigned to then this will delete the old item entry in the menu
-            self::maybe_remove_old_menu_entry( $_POST['old_menu_item'] );
+            self::maybe_remove_old_menu_entry(absint($_POST['old_menu_item']));
 
             $menu_order = count( $menu_items );
 
             $html .= '<div class="pc-sortable-menu dd">';
                 $html .= '<ol class="pc_quick_menu_item_position dd-list">';
-                    foreach( $menu_items as $item ){
+                    foreach($menu_items as $item){
                         $current_item = absint( $item->object_id ) == absint( $_POST['current_post_id'] ) ? 'current-menu-item' : '';
                         $in_menu = self::is_item_already_in_menu( $in_menu, absint( $item->object_id ), absint( $_POST['current_post_id'] ) );
 
@@ -335,11 +340,12 @@ if (!class_exists('PC_Quick_Menu')) {
          * @uses    self::get_child_menu_items()                    Returns objects for child items
          * @return  string      $html                               Built out child menu items
          */
-        private static function get_child_menu( $parent_id ){
+        private static function get_child_menu( $parent_id )
+        {
 
             $html = '';
 
-            $child_items = self::get_child_menu_items( absint( $parent_id ) );
+            $child_items = self::get_child_menu_items(absint($parent_id));
 
             $html .= '<ol class="dd-list pc_quick_menu_item_position">';
                 foreach( $child_items as $item ){
@@ -613,10 +619,11 @@ if (!class_exists('PC_Quick_Menu')) {
          * @param   int         $old_menu_item_id           required                post_id of the old menu entry
          * @uses    wp_delete_post()                                                deletes post given id or object
          */
-        private static function maybe_remove_old_menu_entry( $old_menu_item_id ){
+        private static function maybe_remove_old_menu_entry($old_menu_item_id)
+        {
 
             if ( null != $old_menu_item_id ){
-                wp_delete_post( $old_menu_item_id );
+                wp_delete_post(absint($old_menu_item_id);
             }
 
         } // maybe_remove_old_menu_entry
