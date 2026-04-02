@@ -160,10 +160,10 @@ if (!class_exists('PC_Quick_Menu')) {
                 // if any sub-item has children I need to check that and do a recursive save thing
 
                 if ( isset( $item['children'] ) ){
-                    $updated[] = self::sort_child_items( $item );
+                    $updated[] = self::sort_child_items($item, absint($_POST['current_post_id']));
                 } else {
                     // set the args and update the menu item
-                    $updated[] = self::set_and_save_menu_item( $item );
+                    $updated[] = self::set_and_save_menu_item( $item, absint($_POST['current_post_id']) );
                 }
 
                 if ( ! in_array( false, $updated ) ){
@@ -201,7 +201,7 @@ if (!class_exists('PC_Quick_Menu')) {
          * @uses    self::set_and_save_menu_item()                          saves the menu item
          * @return  array       $updated                                    array to check later for no WP_Error objects
          */
-        private static function sort_child_items($item)
+        private static function sort_child_items($item, $current_post_id)
         {
 
             $updated = array();
@@ -209,11 +209,11 @@ if (!class_exists('PC_Quick_Menu')) {
             if ( isset( $item['children'] ) ){
 
                 foreach( $item['children'] as $child ){
-                    self::sort_child_items( $child );
+                    self::sort_child_items($child, absint($current_post_id));
                 }
 
             } else {
-                $updated[] = self::set_and_save_menu_item( $item );
+                $updated[] = self::set_and_save_menu_item($item, absint($current_post_id));
             }
 
             return (array) $updated;
@@ -231,20 +231,23 @@ if (!class_exists('PC_Quick_Menu')) {
          * @uses    absint()                                            Negative numbers not allowed
          * @uses    wp_update_post()                                    Updates post given post_id and args
          * @uses    update_post_meta()                                  Updates post meta given post_id and key
-         * @
          */
-        private static function set_and_save_menu_item($item)
+        private static function set_and_save_menu_item($item, $current_post_id)
         {
 
+            if (!current_user_can('edit_post', absint($current_post_id))){
+                return false; // just don't update the menu
+            }
+
             $update_args = array(
-                'ID' => absint( $item['menuItemDbId'] ),
-                'menu_order' => intval( $item['menuItemMenuOrder'] ),
+                'ID' => absint($item['menuItemDbId']),
+                'menu_order' => intval($item['menuItemMenuOrder']),
             );
 
-            $updated = wp_update_post( $update_args );
+            $updated = wp_update_post($update_args);
 
-            if ( isset( $item['menuItemParentId'] ) && 0 !== $item['menuItemParentId'] ){
-                update_post_meta( absint( $item['menuItemDbId'] ), '_menu_item_menu_item_parent', absint( $item['menuItemParentId'] ) );
+            if (isset($item['menuItemParentId']) && 0 !== $item['menuItemParentId']) {
+                update_post_meta(absint($item['menuItemDbId']), '_menu_item_menu_item_parent', absint($item['menuItemParentId']));
             }
 
             if ( is_wp_error( $updated ) ){
@@ -811,7 +814,11 @@ if (!class_exists('PC_Quick_Menu')) {
 
 			$plugin_data = get_plugin_data( __FILE__ );
 
-			$version = $plugin_data['Version'];
+            $version = $plugin_data['Version'];
+
+            if ('local' === wp_get_environment_type()) {
+                $version = time();
+            }
 
             // only adding our scripts on specific types that are allowed
             if ( in_array( $screen->id, $allowed_post_types ) ){

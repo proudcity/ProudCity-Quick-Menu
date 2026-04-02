@@ -80,7 +80,7 @@ jQuery(document).ready(function($) {
 
                             //console.log( serializedMenuData);
 
-                            pcq_save_updated_menu_items( menuToUpdate, serializedMenuData, spinner );
+                            pcq_save_updated_menu_items( menuToUpdate, serializedMenuData, spinner, currentPostID );
                             // need to send all that information to pcq_save_updated_menu_items
                         }, 1);
 
@@ -200,7 +200,7 @@ jQuery(document).ready(function($) {
      * @param {int}     menuToUpdate    required            ID of the menu we need to update
      * @param {array}   updatedItems    required            nested array of the menu items we need to update via `wp_save_nav_menu`
      */
-    function pcq_save_updated_menu_items( menuToUpdate, updatedItems, spinner ){
+    function pcq_save_updated_menu_items( menuToUpdate, updatedItems, spinner, currentPostID ){
 
         $(spinner).css('visibility', 'visible');
 
@@ -208,6 +208,7 @@ jQuery(document).ready(function($) {
             'action': 'pcq_update_menu',
             'menu-to-update': menuToUpdate,
             'menu-items': updatedItems,
+            'current_post_id': currentPostID,
             'security': PCQuickMenuScripts.pc_quick_menu_nonce
         }
 
