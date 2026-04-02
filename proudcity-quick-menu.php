@@ -312,9 +312,9 @@ if (!class_exists('PC_Quick_Menu')) {
             $html .= '</div><!-- /.pc-sortable-menu -->';
 
             // used to tell what the db-id of the item is in case we change the menu so we can delete it from the old one
-            $html .= '<div id="old-menu" data-old-menu="'. absint( $nav_menu_item ) .'"></div>';
+            $html .= '<div id="old-menu" data-old-menu="'. absint($nav_menu_item) .'"></div>';
 
-            $html .= '<p class="pcq-edit-menu-link">For more detailed editing of your menu see - <a target="_blank" href="' . site_url() .'/wp-admin/nav-menus.php?action=edit&menu='. absint( $_POST['selected_menu'] ) .'">Advanced Menu Editing</a></p>';
+            $html .= '<p class="pcq-edit-menu-link">For more detailed editing of your menu see - <a target="_blank" href="' . esc_url(site_url()) .'/wp-admin/nav-menus.php?action=edit&menu=' . absint($_POST['selected_menu']) . '">Advanced Menu Editing</a></p>';
 
             $success = true;
             $value = $html;
@@ -594,16 +594,17 @@ if (!class_exists('PC_Quick_Menu')) {
          * @param   object  $item_object    required            Object containing item properties
          * @return  string  $html                               built out HTML for the form
          */
-        private static function edit_item_form( $post_id, $item_object ){
+        private static function edit_item_form($post_id, $item_object)
+        {
 
             $html = '';
 
             $html .= '<div class=pcq-edit-item-form>';
                 $html .= '<label for="pcq-menu-item-title">Display title for ';
-                    $html .= '<span class="pcq-original"><a href="'. get_permalink( absint( $item_object['object_id'] ) ) .'">'. get_post_field( 'post_title', absint( $item_object['object_id'] ) ) .'</a></span>';
+                    $html .= '<span class="pcq-original"><a href="' . esc_url(get_permalink(absint($item_object['object_id']))) . '">'. esc_attr(get_post_field('post_title', absint($item_object['object_id']))) . '</a></span>';
                 $html .= '</label>';
-                $html .= '<input class="pcq-menu-item-title" name="pcq-menu-item-title" value="'. esc_attr( $item_object['title'] ).'" />';
-                $html .= '<button class="pcq-edit-item-button button" data-menu-item-object-id="'. absint( $post_id ) .'">Update</button>';
+                $html .= '<input class="pcq-menu-item-title" name="pcq-menu-item-title" value="' . esc_attr($item_object['title']) . '" />';
+                $html .= '<button class="pcq-edit-item-button button" data-menu-item-object-id="' . absint($post_id) . '">Update</button>';
                 $html .= '<span class="spinner pcq-edit-spinner"></span>';
             $html .= '</div>';
 
@@ -623,7 +624,7 @@ if (!class_exists('PC_Quick_Menu')) {
         {
 
             if ( null != $old_menu_item_id ){
-                wp_delete_post(absint($old_menu_item_id);
+                wp_delete_post(absint($old_menu_item_id));
             }
 
         } // maybe_remove_old_menu_entry
