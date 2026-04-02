@@ -914,14 +914,17 @@ if (!class_exists('PC_Quick_Menu')) {
          * @param   array       $nav_menus      required                Array of nav menu locations
          * @uses    self::is_item_selected()                            Returns selected text if current page is in the menu
          */
-        private static function pc_quick_menu_return_menu_options( $nav_menus ){
+        private static function pc_quick_menu_return_menu_options($nav_menus)
+        {
 
             $html = '';
 
-            foreach( $nav_menus as $nav_menu ){
-                $selected = self::is_item_selected( absint( $nav_menu->term_id ), absint( $_GET['post'] ) );
-                $html .= '<option value="'. absint( $nav_menu->term_id ) .'" '. $selected .'>';
-                    $html .= esc_attr( $nav_menu->name );
+            $post_id = isset($_GET['post']) ? absint($_GET['post']) : 0;
+
+            foreach ($nav_menus as $nav_menu) {
+                $selected = self::is_item_selected(absint($nav_menu->term_id), absint($post_id));
+                $html .= '<option value="' . absint($nav_menu->term_id) . '" ' . $selected . '>';
+                    $html .= esc_attr($nav_menu->name);
                 $html .= '</option>';
             }
 
