@@ -26,6 +26,8 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+defined( 'ABSPATH' ) || exit;
+
 require_once ABSPATH . 'wp-admin/includes/nav-menu.php';
 
 if (!class_exists('PC_Quick_Menu')) {
@@ -48,9 +50,15 @@ if (!class_exists('PC_Quick_Menu')) {
 
         }
 
-        public static function edit_menu_item(){
 
-            check_ajax_referer( 'pc_quick_menu_nonce', 'security' );
+        public static function edit_menu_item()
+        {
+
+            check_ajax_referer('pc_quick_menu_nonce', 'security');
+
+            if (! current_user_can('manage_categories')) {
+                wp_send_json_error('Insufficient permissions');
+            }
 
             $success = false;
             $message = 'The menu item was NOT edited. Please contact a site administrator.';
@@ -88,9 +96,14 @@ if (!class_exists('PC_Quick_Menu')) {
          * @uses    absint()                                    no negative numbers
          * @uses    wp_send_json_success()                      returns the php to our json thing for ajax
          */
-        public static function delete_menu_item(){
+        public static function delete_menu_item()
+        {
 
-            check_ajax_referer( 'pc_quick_menu_nonce', 'security' );
+            check_ajax_referer('pc_quick_menu_nonce', 'security');
+
+            if (! current_user_can('manage_categories')) {
+                wp_send_json_error('Insufficient permissions');
+            }
 
             $post_id = $_POST['post_id'];
 
@@ -126,9 +139,14 @@ if (!class_exists('PC_Quick_Menu')) {
          * @uses    wp_update_post()                                        Updates a post given args with post_id
          * @uses    wp_send_json_success()                                  sends our response back to the jquery request
          */
-        public static function update_menu_items( $menu_to_update = '', $updated_items = '' ){
+        public static function update_menu_items($menu_to_update = '', $updated_items = '')
+        {
 
-            check_ajax_referer( 'pc_quick_menu_nonce', 'security' );
+            check_ajax_referer('pc_quick_menu_nonce', 'security');
+
+            if (! current_user_can('manage_categories')) {
+                wp_send_json_error('Insufficient permissions');
+            }
 
             $updated = array();
 
@@ -179,7 +197,8 @@ if (!class_exists('PC_Quick_Menu')) {
          * @uses    self::set_and_save_menu_item()                          saves the menu item
          * @return  array       $updated                                    array to check later for no WP_Error objects
          */
-        private static function sort_child_items( $item ){
+        private static function sort_child_items($item)
+        {
 
             $updated = array();
 
@@ -210,7 +229,8 @@ if (!class_exists('PC_Quick_Menu')) {
          * @uses    update_post_meta()                                  Updates post meta given post_id and key
          * @
          */
-        private static function set_and_save_menu_item( $item ){
+        private static function set_and_save_menu_item($item)
+        {
 
             $update_args = array(
                 'ID' => absint( $item['menuItemDbId'] ),
@@ -241,7 +261,11 @@ if (!class_exists('PC_Quick_Menu')) {
          * @uses    wp_get_nav_menu_items()                         Returns the items in a menu
          */
         public function get_menu_items(){
-            check_ajax_referer( 'pc_quick_menu_nonce', 'security' );
+            check_ajax_referer('pc_quick_menu_nonce', 'security');
+
+            if (! current_user_can('manage_categories')) {
+                wp_send_json_error('Insufficient permissions');
+            }
 
             $html = '';
             $menu_items = wp_get_nav_menu_items(
