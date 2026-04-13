@@ -2,6 +2,27 @@
 
 ## 2026-04-13
 
+### Security: AJAX Rate Limiting
+
+Added transient-based rate limiting to all four AJAX handlers to prevent DoS abuse by logged-in users.
+
+**Files changed**:
+- `proudcity-quick-menu.php`
+
+**Changes**:
+- Added `const RATE_LIMIT_WINDOW = 10` class constant for the throttle window (seconds)
+- Added `check_rate_limit( $action, $limit )` private static helper using a per-user, per-action transient counter
+- Applied rate limiting to all four AJAX handlers after nonce and capability checks:
+  - `edit_menu_item()` — 2 per 10s
+  - `delete_menu_item()` — 2 per 10s
+  - `get_menu_items()` — 5 per 10s
+  - `update_menu_items()` — 10 per 10s
+- Added docblock to `edit_menu_item()`
+
+References: https://github.com/proudcity/wp-proudcity/issues/2784
+
+---
+
 ### Security: JavaScript Input Validation
 
 Added client-side validation before AJAX submission to prevent malformed or manipulated DOM data from reaching the server.

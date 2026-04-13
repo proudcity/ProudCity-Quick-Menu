@@ -34,6 +34,9 @@ if (!class_exists('PC_Quick_Menu')) {
 
     class PC_Quick_Menu {
 
+        // Rate limit window in seconds. Adjust limits per action in check_rate_limit() calls.
+        const RATE_LIMIT_WINDOW = 10;
+
         /**
          * class constructor
          */
@@ -51,6 +54,36 @@ if (!class_exists('PC_Quick_Menu')) {
         }
 
 
+        /**
+         * Throttles AJAX actions per user to prevent DoS abuse.
+         *
+         * Uses a fixed-window counter stored in a transient. The window length
+         * and per-action limits are defined as constants at the top of this method
+         * so they're easy to adjust without hunting through each handler.
+         *
+         * @param string $action  Short identifier for the action (e.g. 'edit', 'delete').
+         * @param int    $limit   Max requests allowed within the window.
+         */
+        private static function check_rate_limit( string $action, int $limit ): void {
+            $key   = 'pcq_rl_' . get_current_user_id() . '_' . $action;
+            $count = (int) get_transient( $key );
+
+            if ( $count >= $limit ) {
+                wp_send_json_error( 'Too many requests. Please wait before trying again.' );
+            }
+
+            set_transient( $key, $count + 1, self::RATE_LIMIT_WINDOW );
+        }
+
+        /**
+         * Updates a menu item's title via AJAX.
+         *
+         * @uses check_ajax_referer()       Verifies the request nonce.
+         * @uses current_user_can()         Confirms the user has menu editing capability.
+         * @uses self::check_rate_limit()   Throttles repeated requests.
+         * @uses wp_update_post()           Saves the updated post title.
+         * @uses wp_send_json_success()     Returns the result to the AJAX caller.
+         */
         public static function edit_menu_item()
         {
 
@@ -59,6 +92,8 @@ if (!class_exists('PC_Quick_Menu')) {
             if (! current_user_can('manage_categories')) {
                 wp_send_json_error('Insufficient permissions');
             }
+
+            self::check_rate_limit( 'edit', 2 );
 
             $success = false;
             $message = 'The menu item was NOT edited. Please contact a site administrator.';
@@ -105,6 +140,8 @@ if (!class_exists('PC_Quick_Menu')) {
                 wp_send_json_error('Insufficient permissions');
             }
 
+            self::check_rate_limit( 'delete', 2 );
+
             $post_id = $_POST['post_id'];
 
             $success = false;
@@ -147,6 +184,8 @@ if (!class_exists('PC_Quick_Menu')) {
             if (! current_user_can('manage_categories')) {
                 wp_send_json_error('Insufficient permissions');
             }
+
+            self::check_rate_limit( 'update', 10 );
 
             $updated = array();
 
@@ -274,6 +313,8 @@ if (!class_exists('PC_Quick_Menu')) {
             if (! current_user_can('manage_categories')) {
                 wp_send_json_error('Insufficient permissions');
             }
+
+            self::check_rate_limit( 'get', 5 );
 
             $html = '';
             $menu_items = wp_get_nav_menu_items(
