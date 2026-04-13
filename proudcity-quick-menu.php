@@ -43,7 +43,6 @@ if (!class_exists('PC_Quick_Menu')) {
         function __construct() {
             add_action('admin_enqueue_scripts', array($this, 'wp_quick_menu_add_css_js'));
             add_action('add_meta_boxes', array($this, 'wp_quick_menu_add_meta_box'));
-//            add_action('save_post', array($this, 'wp_quick_menu_save_meta_box_data'));
 
             // ajax actions
             add_action( 'wp_ajax_pc_quick_get_menu_items', array( $this, 'get_menu_items' ) );
