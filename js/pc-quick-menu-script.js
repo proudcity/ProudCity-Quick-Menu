@@ -1,5 +1,16 @@
 jQuery(document).ready(function($) {
 
+    /**
+     * Returns a positive integer, or null if the value is missing/invalid.
+     *
+     * @param {*} val
+     * @returns {number|null}
+     */
+    function pcq_valid_id( val ) {
+        var n = parseInt( val, 10 );
+        return ( ! isNaN( n ) && n > 0 ) ? n : null;
+    }
+
     var menuWrapper = $('.inside.pc_quick_menu_wrapper');
     var menuSelect = $(menuWrapper).find('select#wp_quick_nav_menu');
     var menuPositionSelect = $(menuWrapper).find('.pc_quick_menu_position');
@@ -117,7 +128,11 @@ jQuery(document).ready(function($) {
 
             $(this).removeData();
 
-            var menuItemDbId = $(this).data('menu-item-db-id');
+            var menuItemDbId = pcq_valid_id( $(this).data('menu-item-db-id') );
+            if ( menuItemDbId === null ) {
+                return; // skip items with missing/invalid DB ID
+            }
+
             var menuItemObjectId = $(this).data('menu-item-object-id');
             var menuItemObject = $(this).data('menu-item-object');
             var menuItemParentId = $(this).data('menu-item-parent-id');
@@ -129,7 +144,7 @@ jQuery(document).ready(function($) {
             var menuItemTarget = $(this).data('menu-item-target');
             var menuItemClasses = $(this).data('menu-item-classes');
             var menuItemXfn = $(this).data('menu-item-xfn');
-            var menuItemMenuOrder = $(this).data('menu-item-menu-order');
+            var menuItemMenuOrder = pcq_valid_id( $(this).data('menu-item-menu-order') ) || ( index + 1 );
 
             setupMenuData.push({
                 'menuItemDbId': menuItemDbId,
@@ -232,13 +247,18 @@ jQuery(document).ready(function($) {
      */
     $(menuWrapper).on('click touchstart', '.pcq_delete_item', function(){
 
-        // show spinner
-        $(spinner).css('visibility', 'visible' );
-
         var parentItem = $(this).closest('.pc_quick_menu_item');
-        var postID = $(parentItem).data('menu-item-db-id');
+        var postID = pcq_valid_id( $(parentItem).data('menu-item-db-id') );
         var deletePostID = $(parentItem).data('menu-item-object-id');
         var currentPostID = $('#post_ID').val();
+
+        if ( postID === null ) {
+            $('#pcq_feedback_message').empty().show().append('Invalid menu item ID.').delay(1500).fadeOut();
+            return;
+        }
+
+        // show spinner
+        $(spinner).css('visibility', 'visible' );
 
         var data = {
             'action': 'pcq_delete_menu_item',
@@ -293,9 +313,19 @@ jQuery(document).ready(function($) {
         var menuParentWrap = $(this).closest('.pc_quick_menu_item');
         var parentItem = $(this).parent('.pcq-edit-item-form');
         var editSpinner = $(parentItem).find('.spinner');
-        var editPostId = $(parentItem).find('.pcq-edit-item-button').data('menu-item-object-id');
-        var itemTitle = $(parentItem).find('.pcq-menu-item-title').val();
+        var editPostId = pcq_valid_id( $(parentItem).find('.pcq-edit-item-button').data('menu-item-object-id') );
+        var itemTitle = $.trim( $(parentItem).find('.pcq-menu-item-title').val() );
         var editButton = $(this);
+
+        if ( editPostId === null ) {
+            $('#pcq_feedback_message').empty().show().append('Invalid menu item ID.').delay(1500).fadeOut();
+            return;
+        }
+
+        if ( itemTitle.length === 0 ) {
+            $('#pcq_feedback_message').empty().show().append('Title cannot be empty.').delay(1500).fadeOut();
+            return;
+        }
 
         $(editSpinner).css('visibility', 'visible');
 
