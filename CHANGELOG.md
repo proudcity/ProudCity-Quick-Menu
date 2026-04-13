@@ -2,6 +2,20 @@
 
 ## 2026-04-13
 
+### Security: Restrict Metabox to Capable Users
+
+The quick menu metabox was registered for all users who could edit posts, exposing the admin UI to users who lack menu editing capability. Added a `current_user_can('manage_categories')` check at the top of `wp_quick_menu_add_meta_box()` to match the capability check already in place on all AJAX handlers.
+
+**Files changed**:
+- `proudcity-quick-menu.php`
+
+**Changes**:
+- `wp_quick_menu_add_meta_box()`: returns early if the current user cannot `manage_categories`
+
+References: https://github.com/proudcity/wp-proudcity/issues/2784
+
+---
+
 ### Security: AJAX Rate Limiting
 
 Added transient-based rate limiting to all four AJAX handlers to prevent DoS abuse by logged-in users.

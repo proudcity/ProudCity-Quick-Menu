@@ -888,6 +888,10 @@ if (!class_exists('PC_Quick_Menu')) {
          */
         function wp_quick_menu_add_meta_box() {
 
+            if ( ! current_user_can( 'manage_categories' ) ) {
+                return;
+            }
+
             /**
              * Allows end users to add their own post types, or remove the default post types
              *
