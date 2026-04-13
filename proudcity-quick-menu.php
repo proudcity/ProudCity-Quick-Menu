@@ -3,8 +3,8 @@
 /*
   Plugin Name: ProudCity Quick Menu
   Description: Add page/post to menu on create or edit screen
-  Version: 2023.09.26.1052
-  Tested up to: 6.0.0
+  Version: 2026.04.13.1559
+  Tested up to: 6.9.4
   Author: proudcity, curtismchale
   Author URI: https://proudcity.com
   License: GPLv2 or later
