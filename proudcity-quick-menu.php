@@ -3,7 +3,7 @@
 /*
   Plugin Name: ProudCity Quick Menu
   Description: Add page/post to menu on create or edit screen
-  Version: 2026.04.13.1559
+  Version: 2026.04.15.0937
   Tested up to: 6.9.4
   Author: proudcity, curtismchale
   Author URI: https://proudcity.com
@@ -333,8 +333,11 @@ if (!class_exists('PC_Quick_Menu')) {
                         $current_item = absint( $item->object_id ) == absint( $_POST['current_post_id'] ) ? 'current-menu-item' : '';
                         $in_menu = self::is_item_already_in_menu( $in_menu, absint( $item->object_id ), absint( $_POST['current_post_id'] ) );
 
-                        // sets the id of the nav menu item so we can use it to delete the item if we change menus
-                        $nav_menu_item = ( true === $in_menu ) ? absint( $item->db_id ) : '';
+                        // sets the id of the nav menu item so we can use it to delete the item if we change menus.
+                        // only capture when this specific item matches the current post, not every subsequent item.
+                        if ( absint( $item->object_id ) === absint( $_POST['current_post_id'] ) ) {
+                            $nav_menu_item = absint( $item->db_id );
+                        }
 
                         // if this is a child item it gets caught in the get_single_item call
                         if ( ! self::is_item_a_child_item( $item ) ){
@@ -621,6 +624,7 @@ if (!class_exists('PC_Quick_Menu')) {
                 update_post_meta( absint( $nav_menu_item ), '_menu_item_object_id', absint( $post_id ) );
                 update_post_meta( absint( $nav_menu_item ), '_menu_item_object', get_post_type( absint( $post_id ) ) );
                 update_post_meta( absint( $nav_menu_item ), '_menu_item_type', 'post_type' );
+                update_post_meta( absint( $nav_menu_item ), '_menu_item_menu_item_parent', 0 );
 
                 return absint( $nav_menu_item );
 
@@ -829,6 +833,7 @@ if (!class_exists('PC_Quick_Menu')) {
             $html .= '<li class="pc_quick_menu_item current-menu-item dd-item" ';
                 $html .= 'data-menu-item-object-id="'. absint( $post_id ) .'" ';
                 $html .= 'data-menu-item-db-id="' . absint( $db_id ) .'" ';
+                $html .= 'data-menu-item-parent-id="0" ';
                 $html .= 'data-menu-item-menu-order="nope">';
                 $html .= '<div class="pcq-item-title-wrap">';
                     $html .= '<span class="pcq-title-wrap dd-handle">'. esc_attr( $title ) .'</span>';

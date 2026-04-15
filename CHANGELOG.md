@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-04-15
+
+### Fix: Menu layout broken after adding item via quick menu
+
+Identified and fixed three bugs that could cause the menu display to break after using the quick-menu metabox, matching the symptom where opening the WP menu editor and saving without changes would restore the layout.
+
+**Bug 1 (primary cause):** `$nav_menu_item` was overwritten on every loop iteration after `$in_menu` became true, ending up as the last menu item's db_id instead of the current post's. When changing menus, the wrong nav_menu_item was passed to `maybe_remove_old_menu_entry` and deleted, leaving its children with stale `_menu_item_menu_item_parent` values pointing to a nonexistent post. Those orphaned children became invisible in the menu display.
+
+**Bug 2:** `add_new_item_to_menu` never set `_menu_item_menu_item_parent` on newly created nav_menu_items. WordPress expects this meta to be present (set to `0` for top-level items) for correct nesting queries.
+
+**Bug 3:** `get_current_item` rendered the newly added item's `<li>` without a `data-menu-item-parent-id` attribute, unlike all other items rendered by `get_single_item`. Added `data-menu-item-parent-id="0"` to match.
+
+References: https://github.com/proudcity/wp-proudcity/issues/2776
+
+**Files changed**:
+- `proudcity-quick-menu.php`
+
 ## 2026-04-13
 
 ### Security: Restrict Metabox to Capable Users
