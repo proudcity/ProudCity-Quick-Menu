@@ -167,15 +167,13 @@ if (!class_exists('PC_Quick_Menu')) {
          *
          * @since 1.2
          *
-         * @param   int         $menu_to_update         optional            The ID of the menu to update
-         * @param   array       $updated_items          optional            Array of menu items with their data
          * @uses    check_ajax_referer()                                    Ajax security stuff
          * @uses    absint()                                                no negative numbers
          * @uses    intval()                                                make sure it's a number
          * @uses    wp_update_post()                                        Updates a post given args with post_id
          * @uses    wp_send_json_success()                                  sends our response back to the jquery request
          */
-        public static function update_menu_items($menu_to_update = '', $updated_items = '')
+        public static function update_menu_items()
         {
 
             check_ajax_referer('pc_quick_menu_nonce', 'security');
@@ -325,7 +323,7 @@ if (!class_exists('PC_Quick_Menu')) {
             // if we changed the menu the item was assigned to then this will delete the old item entry in the menu
             self::maybe_remove_old_menu_entry(absint($_POST['old_menu_item']));
 
-            $menu_order = count( $menu_items );
+            $menu_order = empty( $menu_items ) ? 1 : max( wp_list_pluck( $menu_items, 'menu_order' ) ) + 1;
 
             $html .= '<div class="pc-sortable-menu dd">';
                 $html .= '<ol class="pc_quick_menu_item_position dd-list">';
@@ -690,7 +688,7 @@ if (!class_exists('PC_Quick_Menu')) {
 
             $sanitized_classes = '';
 
-            foreach( $class_array as $key => $value ){
+            foreach( $class_array as $value ){
                 $sanitized_classes .= sanitize_html_class( $value ) . ' ';
             }
 
@@ -921,7 +919,7 @@ if (!class_exists('PC_Quick_Menu')) {
          * @uses    wp_get_nav_menus()                                          Returns all registered navigation menu objects
          * @uses    $this->wp_quick_menu_check_menu_entry()
          */
-        function wp_quick_menu_meta_box_call_back($post) {
+        function wp_quick_menu_meta_box_call_back($_post) {
 
             wp_nonce_field('wp_quick_menu_meta_box', 'wp_quick_menu_meta_box_nonce');
 

@@ -2,6 +2,23 @@
 
 ## 2026-04-15
 
+### Fix: menu_order collision when adding new items; code cleanup
+
+`add_new_item_to_menu` used `count($menu_items)` for the new item's `menu_order`. When existing items did not have perfectly sequential orders, this produced a value already taken by another item, causing MySQL's tie-breaking to return items out of depth-first sequence and breaking `get_nested_menu` nesting. Changed to `max(menu_order) + 1` so the new item always lands after every existing item.
+
+**Files changed:**
+- `proudcity-quick-menu.php`
+
+**Changes:**
+- `add_new_item_to_menu()`: `menu_order` now uses `max( wp_list_pluck( $menu_items, 'menu_order' ) ) + 1`
+- `update_menu_items()`: removed unused `$menu_to_update` and `$updated_items` parameters (AJAX handler reads from `$_POST` directly; parameters were never passed by the hook)
+- `sanitize_array_of_css_classes()`: removed unused `$key =>` from foreach
+- `wp_quick_menu_meta_box_call_back()`: renamed `$post` → `$_post` (required by hook, intentionally unused)
+
+References: https://github.com/proudcity/wp-proudcity/issues/2776
+
+---
+
 ### Fix: Menu layout broken after adding item via quick menu
 
 Identified and fixed three bugs that could cause the menu display to break after using the quick-menu metabox, matching the symptom where opening the WP menu editor and saving without changes would restore the layout.
